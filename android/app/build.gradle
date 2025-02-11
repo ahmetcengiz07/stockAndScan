@@ -1,0 +1,6 @@
+android {
+    defaultConfig {
+        // ... diğer ayarlar
+        missingDimensionStrategy 'react-native-camera', 'general'
+    }
+} 
