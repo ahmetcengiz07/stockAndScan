@@ -81,6 +81,13 @@ const ProductDetail = ({ route, navigation }) => {
             <Text style={styles.buttonText}>Stok Arttır (+1)</Text>
           </TouchableOpacity>
         </View>
+
+        <TouchableOpacity 
+          style={[styles.editButton]}
+          onPress={() => navigation.navigate('EditProduct', { product })}
+        >
+          <Text style={styles.editButtonText}>Ürünü Düzenle</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -174,6 +181,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     fontFamily: 'monospace',
+  },
+  editButton: {
+    backgroundColor: '#4a90e2',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 15,
+  },
+  editButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

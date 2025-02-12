@@ -12,6 +12,7 @@ import ScanScreen from './src/screens/ScanScreen';
 import StockScreen from './src/screens/StockScreen';
 import AddProductScreen from './src/screens/AddProductScreen';
 import ProductDetail from './src/screens/ProductDetail';
+import EditProduct from './src/screens/EditProduct';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -97,6 +98,16 @@ const AppContent = () => {
           options={{
             headerShown: true,
             title: 'Ürün Detayı',
+            headerStyle: { backgroundColor: '#20B2AA' },
+            headerTintColor: '#fff',
+          }}
+        />
+        <Stack.Screen 
+          name="EditProduct" 
+          component={EditProduct}
+          options={{
+            headerShown: true,
+            title: 'Ürün Düzenle',
             headerStyle: { backgroundColor: '#20B2AA' },
             headerTintColor: '#fff',
           }}

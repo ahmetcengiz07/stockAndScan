@@ -38,6 +38,12 @@ const stockSlice = createSlice({
     },
     setError: (state, action) => {
       state.error = action.payload;
+    },
+    updateProduct: (state, action) => {
+      const index = state.products.findIndex(p => p.barcode === action.payload.barcode);
+      if (index !== -1) {
+        state.products[index] = action.payload;
+      }
     }
   }
 });
@@ -67,7 +73,8 @@ export const {
   updateQuantity, 
   removeProduct, 
   setLoading, 
-  setError 
+  setError, 
+  updateProduct 
 } = stockSlice.actions;
 
 export default stockSlice.reducer; 
