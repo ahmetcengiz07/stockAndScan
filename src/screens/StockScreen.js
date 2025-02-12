@@ -26,7 +26,7 @@ const StockScreen = ({ navigation, route }) => {
         <Ionicons 
           name={item.category === 'Tulum' ? 'shirt' : 
                 item.category === 'Elbise' ? 'glasses' : 
-                item.category === 'Ayakkabı' ? 'footsteps' : 'shirt-outline'} 
+                item.category === 'Ayakkabı' ? 'walk' : 'shirt-outline'} 
           size={24} 
           color="#20B2AA" 
         />

@@ -29,7 +29,7 @@ const ProductDetail = ({ route, navigation }) => {
           <Ionicons 
             name={product.category === 'Tulum' ? 'shirt' : 
                   product.category === 'Elbise' ? 'glasses' : 
-                  product.category === 'Ayakkabı' ? 'footsteps' : 'shirt-outline'} 
+                  product.category === 'Ayakkabı' ? 'walk' : 'shirt-outline'} 
             size={40} 
             color="#20B2AA" 
           />

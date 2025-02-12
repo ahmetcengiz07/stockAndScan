@@ -53,7 +53,7 @@ const HomeScreen = ({ navigation }) => {
               style={styles.categoryCard}
               onPress={() => handleCategoryPress('Ayakkabı')}
             >
-              <Ionicons name="footsteps" size={24} color="#20B2AA" />
+              <Ionicons name="walk" size={24} color="#20B2AA" />
               <Text style={styles.categoryText}>Ayakkabı</Text>
             </TouchableOpacity>
             <TouchableOpacity 
