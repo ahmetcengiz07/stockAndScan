@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useSelector } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -9,13 +9,30 @@ const HomeScreen = ({ navigation }) => {
   const totalProducts = products.length;
   const lowStockProducts = products.filter(p => p.quantity < 5).length;
 
+  const categories = [
+    'Yenidoğan takımları',
+    'İkili takımlar',
+    'Ceketli takımlar',
+    'Üçlü takımlar',
+    'Tulumlar',
+    'Elbiseler',
+    'Battaniyeler',
+    'Bornozlar',
+    'Trikolar',
+    'Sweatler',
+    'Çoraplar',
+    'Şapkalar',
+    'Zıbınlar',
+    'Tokalar'
+  ];
+
   const handleCategoryPress = (category) => {
     navigation.navigate('Stok Listesi', { selectedCategory: category });
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.backgroundImage}>
+    <ScrollView style={styles.container}>
+      <View style={styles.content}>
         <Text style={styles.welcomeText}>Hoş Geldiniz</Text>
         
         <View style={styles.statsContainer}>
@@ -35,38 +52,35 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.categoriesContainer}>
           <Text style={styles.sectionTitle}>Kategoriler</Text>
           <View style={styles.categoryGrid}>
-            <TouchableOpacity 
-              style={styles.categoryCard}
-              onPress={() => handleCategoryPress('Tulum')}
-            >
-              <Ionicons name="shirt" size={24} color="#20B2AA" />
-              <Text style={styles.categoryText}>Tulum</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.categoryCard}
-              onPress={() => handleCategoryPress('Elbise')}
-            >
-              <Ionicons name="glasses" size={24} color="#20B2AA" />
-              <Text style={styles.categoryText}>Elbise</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.categoryCard}
-              onPress={() => handleCategoryPress('Ayakkabı')}
-            >
-              <Ionicons name="walk" size={24} color="#20B2AA" />
-              <Text style={styles.categoryText}>Ayakkabı</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.categoryCard}
-              onPress={() => handleCategoryPress('Diğer')}
-            >
-              <Ionicons name="shirt-outline" size={24} color="#20B2AA" />
-              <Text style={styles.categoryText}>Diğer</Text>
-            </TouchableOpacity>
+            {categories.map((category) => (
+              <TouchableOpacity 
+                key={category}
+                style={styles.categoryCard}
+                onPress={() => handleCategoryPress(category)}
+              >
+                <Ionicons 
+                  name={
+                    category.includes('takım') ? 'shirt' :
+                    category === 'Tulumlar' ? 'shirt' :
+                    category === 'Elbiseler' ? 'shirt-outline' :
+                    category === 'Battaniyeler' ? 'bed-outline' :
+                    category === 'Bornozlar' ? 'water-outline' :
+                    category === 'Trikolar' || category === 'Sweatler' ? 'shirt' :
+                    category === 'Çoraplar' ? 'footsteps-outline' :
+                    category === 'Şapkalar' ? 'glasses-outline' :
+                    category === 'Zıbınlar' ? 'shirt-outline' :
+                    category === 'Tokalar' ? 'flower-outline' : 'shirt-outline'
+                  } 
+                  size={24} 
+                  color="#20B2AA" 
+                />
+                <Text style={styles.categoryText}>{category}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -75,9 +89,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  backgroundImage: {
-    flex: 1,
+  content: {
     padding: 20,
+    paddingBottom: 30, // Alt kısımda ekstra padding
   },
   welcomeText: {
     fontSize: 28,
@@ -130,6 +144,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
+    paddingHorizontal: 5,
   },
   categoryCard: {
     backgroundColor: '#fff',
@@ -151,6 +166,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 14,
     color: '#333',
+    textAlign: 'center',
   },
 });
 

@@ -1,25 +1,48 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { updateQuantity } from '../redux/slices/stockSlice';
 import { Ionicons } from '@expo/vector-icons';
+import CustomModal from '../components/CustomModal';
 
 const ProductDetail = ({ route, navigation }) => {
   const { product } = route.params;
   const dispatch = useDispatch();
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalConfig, setModalConfig] = useState({
+    title: '',
+    message: '',
+    type: 'success'
+  });
+  const [currentStock, setCurrentStock] = useState(product.quantity);
 
   const handleUpdateStock = (amount) => {
-    if (amount === -1 && product.quantity <= 0) {
-      Alert.alert("Uyarı", "Stok zaten 0'da!");
+    if (amount === -1 && currentStock <= 0) {
+      setModalConfig({
+        title: 'Uyarı',
+        message: "Stok zaten 0'da!",
+        type: 'error'
+      });
+      setModalVisible(true);
       return;
     }
     
+    const newStock = currentStock + amount;
+    setCurrentStock(newStock);
     dispatch(updateQuantity({ barcode: product.barcode, quantity: amount }));
-    Alert.alert(
-      "Başarılı",
-      `Stok ${amount > 0 ? 'arttırıldı' : 'azaltıldı'}`,
-      [{ text: "Tamam", onPress: () => navigation.goBack() }]
-    );
+    setModalConfig({
+      title: 'Başarılı',
+      message: `Stok ${amount > 0 ? 'arttırıldı' : 'azaltıldı'}\nGüncel Stok: ${newStock}`,
+      type: 'success'
+    });
+    setModalVisible(true);
+  };
+
+  const handleModalClose = () => {
+    setModalVisible(false);
+    if (modalConfig.type === 'success') {
+      navigation.goBack();
+    }
   };
 
   return (
@@ -83,12 +106,20 @@ const ProductDetail = ({ route, navigation }) => {
         </View>
 
         <TouchableOpacity 
-          style={[styles.editButton]}
+          style={styles.editButton}
           onPress={() => navigation.navigate('EditProduct', { product })}
         >
+          <Ionicons name="create-outline" size={24} color="#fff" style={styles.editIcon} />
           <Text style={styles.editButtonText}>Ürünü Düzenle</Text>
         </TouchableOpacity>
       </View>
+      <CustomModal
+        visible={modalVisible}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
+        onClose={handleModalClose}
+      />
     </View>
   );
 };
@@ -188,11 +219,17 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 15,
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   editButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+    marginLeft: 8,
+  },
+  editIcon: {
+    marginRight: 4,
   },
 });
 

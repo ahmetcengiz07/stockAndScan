@@ -1,169 +1,295 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TextInput, 
-  TouchableOpacity, 
-  ScrollView,
-  Alert 
-} from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { addProduct } from '../redux/slices/stockSlice';
 import { Ionicons } from '@expo/vector-icons';
-
-const CATEGORIES = ['Tulum', 'Elbise', 'Ayakkabı', 'Diğer'];
-const SIZES = ['0-3 ay', '3-6 ay', '6-9 ay', '9-12 ay', '12-18 ay', '18-24 ay'];
+import CustomModal from '../components/CustomModal';
 
 const AddProductScreen = ({ route, navigation }) => {
-  const { barcode } = route.params;
   const dispatch = useDispatch();
+  const { barcode: scannedBarcode } = route.params;
   const products = useSelector(state => state.stock.products);
-  
-  useEffect(() => {
-    const existingProduct = products.find(p => p.barcode === barcode);
-    if (existingProduct) {
-      Alert.alert(
-        "Uyarı",
-        `Bu barkoda (${barcode}) sahip ürün zaten mevcut:\n\n${existingProduct.name}\nKategori: ${existingProduct.category}\nBeden: ${existingProduct.size}`,
-        [
-          {
-            text: "Tamam",
-            onPress: () => navigation.goBack(),
-          }
-        ]
-      );
-    }
-  }, [barcode, products, navigation]);
 
-  const [product, setProduct] = useState({
-    barcode: barcode,
-    name: '',
-    category: '',
-    size: '',
-    color: '',
-    quantity: '0',
-    price: '0',
+  const [barcode, setBarcode] = useState(scannedBarcode || '');
+  const [name, setName] = useState('');
+  const [category, setCategory] = useState('');
+  const [size, setSize] = useState('');
+  const [color, setColor] = useState('');
+  const [price, setPrice] = useState('');
+  const [quantity, setQuantity] = useState('1');
+  const [formattedPrice, setFormattedPrice] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalConfig, setModalConfig] = useState({
+    title: '',
+    message: '',
+    type: 'success'
   });
 
+  const categories = [
+    'Yenidoğan takımları',
+    'İkili takımlar',
+    'Ceketli takımlar',
+    'Üçlü takımlar',
+    'Tulumlar',
+    'Elbiseler',
+    'Battaniyeler',
+    'Bornozlar',
+    'Trikolar',
+    'Sweatler',
+    'Çoraplar',
+    'Şapkalar',
+    'Zıbınlar',
+    'Tokalar'
+  ];
+
+  const sizes = [
+    'Yeni Doğan',
+    '0-3 Ay',
+    '3-6 Ay',
+    '6-9 Ay',
+    '9-12 Ay',
+    '12-18 Ay',
+    '18-24 Ay',
+    '2 Yaş',
+    '3 Yaş',
+    '4 Yaş',
+    '5 Yaş',
+    '6 Yaş',
+    '7 Yaş',
+    '8 Yaş',
+    '9 Yaş',
+  ];
+
+  const colors = ['Siyah', 'Beyaz', 'Kırmızı', 'Mavi', 'Yeşil', 'Sarı', 'Mor', 'Pembe', 'Gri', 'Kahverengi'];
+
+  const colorCodes = {
+    'Siyah': '#000000',
+    'Beyaz': '#FFFFFF',
+    'Kırmızı': '#FF0000',
+    'Mavi': '#0000FF',
+    'Yeşil': '#008000',
+    'Sarı': '#FFFF00',
+    'Mor': '#800080',
+    'Pembe': '#FFC0CB',
+    'Gri': '#808080',
+    'Kahverengi': '#8B4513'
+  };
+
+  const formatPrice = (value) => {
+    const cleanValue = value.replace(/[.,]/g, '');
+    const length = cleanValue.length;
+    let formattedValue = '';
+
+    if (length <= 2) {
+      formattedValue = '0,' + cleanValue.padStart(2, '0');
+    } else {
+      const lira = cleanValue.slice(0, length - 2);
+      const kurus = cleanValue.slice(length - 2);
+      formattedValue = Number(lira).toLocaleString('tr-TR') + ',' + kurus;
+    }
+
+    setFormattedPrice(formattedValue);
+    setPrice((Number(cleanValue) / 100).toString());
+  };
+
   const handleSave = () => {
-    const existingProduct = products.find(p => p.barcode === barcode);
-    if (existingProduct) {
-      Alert.alert("Hata", "Bu barkoda sahip ürün zaten mevcut!");
+    if (!barcode || !name || !category || !size || !color || !price || !quantity) {
+      setModalConfig({
+        title: 'Hata',
+        message: 'Lütfen tüm alanları doldurun',
+        type: 'error'
+      });
+      setModalVisible(true);
       return;
     }
 
-    if (!product.name || !product.category || !product.size) {
-      Alert.alert('Uyarı', 'Lütfen tüm zorunlu alanları doldurun.');
+    if (products.some(p => p.barcode === barcode)) {
+      setModalConfig({
+        title: 'Hata',
+        message: 'Bu barkoda sahip bir ürün zaten var',
+        type: 'error'
+      });
+      setModalVisible(true);
       return;
     }
 
-    dispatch(addProduct({
-      ...product,
-      id: Date.now().toString(),
-      quantity: parseInt(product.quantity),
-      price: parseFloat(product.price),
-      lastUpdated: new Date().toISOString()
-    }));
-    navigation.navigate('Ana Sayfa');
+    const newProduct = {
+      barcode,
+      name,
+      category,
+      size,
+      color,
+      price: parseFloat(price),
+      quantity: parseInt(quantity)
+    };
+
+    dispatch(addProduct(newProduct));
+    setModalConfig({
+      title: 'Başarılı',
+      message: 'Ürün başarıyla eklendi',
+      type: 'success'
+    });
+    setModalVisible(true);
+  };
+
+  const handleModalClose = () => {
+    setModalVisible(false);
+    if (modalConfig.type === 'success') {
+      navigation.goBack();
+    }
   };
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.barcodeContainer}>
-        <Ionicons name="barcode-outline" size={24} color="#20B2AA" />
-        <Text style={styles.barcodeText}>Barkod: {barcode}</Text>
-      </View>
-      
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Ürün Adı *</Text>
-        <TextInput
-          style={styles.input}
-          value={product.name}
-          onChangeText={(text) => setProduct({...product, name: text})}
-          placeholder="Ürün adını girin"
-        />
-      </View>
+      <View style={styles.card}>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Barkod:</Text>
+          <View style={styles.barcodeInputContainer}>
+            <Ionicons name="barcode-outline" size={24} color="#20B2AA" style={styles.barcodeIcon} />
+            <TextInput
+              style={styles.barcodeInput}
+              value={barcode}
+              onChangeText={setBarcode}
+              placeholder="Barkod"
+              keyboardType="numeric"
+            />
+          </View>
+        </View>
 
-      <Text style={styles.label}>Kategori *</Text>
-      <View style={styles.categoryContainer}>
-        {CATEGORIES.map((category) => (
-          <TouchableOpacity
-            key={category}
-            style={[
-              styles.categoryButton,
-              product.category === category && styles.categoryButtonActive
-            ]}
-            onPress={() => setProduct({...product, category})}
-          >
-            <Text style={[
-              styles.categoryButtonText,
-              product.category === category && styles.categoryButtonTextActive
-            ]}>
-              {category}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <Text style={styles.label}>Beden *</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.sizeContainer}>
-        {SIZES.map((size) => (
-          <TouchableOpacity
-            key={size}
-            style={[
-              styles.sizeButton,
-              product.size === size && styles.sizeButtonActive
-            ]}
-            onPress={() => setProduct({...product, size})}
-          >
-            <Text style={[
-              styles.sizeButtonText,
-              product.size === size && styles.sizeButtonTextActive
-            ]}>
-              {size}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
-
-      <View style={styles.inputContainer}>
-        <Text style={styles.label}>Renk</Text>
-        <TextInput
-          style={styles.input}
-          value={product.color}
-          onChangeText={(text) => setProduct({...product, color: text})}
-          placeholder="Renk girin"
-        />
-      </View>
-
-      <View style={styles.row}>
-        <View style={[styles.inputContainer, { flex: 1, marginRight: 10 }]}>
-          <Text style={styles.label}>Miktar</Text>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Ürün Adı:</Text>
           <TextInput
             style={styles.input}
-            value={product.quantity}
-            onChangeText={(text) => setProduct({...product, quantity: text})}
-            keyboardType="numeric"
-            placeholder="0"
+            value={name}
+            onChangeText={setName}
+            placeholder="Ürün adı"
           />
         </View>
 
-        <View style={[styles.inputContainer, { flex: 1 }]}>
-          <Text style={styles.label}>Fiyat (TL)</Text>
-          <TextInput
-            style={styles.input}
-            value={product.price}
-            onChangeText={(text) => setProduct({...product, price: text})}
-            keyboardType="numeric"
-            placeholder="0.00"
-          />
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Kategori:</Text>
+          <View style={styles.pickerContainer}>
+            {categories.map((cat) => (
+              <TouchableOpacity
+                key={cat}
+                style={[
+                  styles.pickerItem,
+                  category === cat && styles.pickerItemSelected
+                ]}
+                onPress={() => setCategory(cat)}
+              >
+                <Text style={[
+                  styles.pickerItemText,
+                  category === cat && styles.pickerItemTextSelected
+                ]}>{cat}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Beden:</Text>
+          <View style={styles.pickerContainer}>
+            {sizes.map((s) => (
+              <TouchableOpacity
+                key={s}
+                style={[
+                  styles.pickerItem,
+                  size === s && styles.pickerItemSelected
+                ]}
+                onPress={() => setSize(s)}
+              >
+                <Text style={[
+                  styles.pickerItemText,
+                  size === s && styles.pickerItemTextSelected
+                ]}>{s}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Renk:</Text>
+          <View style={styles.pickerContainer}>
+            {colors.map((c) => (
+              <TouchableOpacity
+                key={c}
+                style={[
+                  styles.pickerItem,
+                  {
+                    backgroundColor: color === c ? colorCodes[c] : '#fff',
+                    borderColor: color === c ? colorCodes[c] : '#ddd',
+                    borderWidth: color === c ? 3 : 1
+                  }
+                ]}
+                onPress={() => setColor(c)}
+              >
+                <Text style={[
+                  styles.pickerItemText,
+                  color === c && styles.pickerItemTextSelected,
+                  color === c && (c === 'Beyaz' || c === 'Sarı') ? { color: '#333' } : color === c ? { color: '#fff' } : null
+                ]}>{c}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Stok Miktarı:</Text>
+          <View style={styles.quantityContainer}>
+            <TouchableOpacity
+              style={styles.quantityButton}
+              onPress={() => setQuantity(prev => (parseInt(prev) - 1).toString())}
+              disabled={parseInt(quantity) <= 1}
+            >
+              <Ionicons name="remove" size={24} color={parseInt(quantity) <= 1 ? '#ccc' : '#20B2AA'} />
+            </TouchableOpacity>
+            <TextInput
+              style={styles.quantityInput}
+              value={quantity}
+              onChangeText={(text) => {
+                if (text === '' || /^\d+$/.test(text)) {
+                  setQuantity(text);
+                }
+              }}
+              keyboardType="numeric"
+              textAlign="center"
+            />
+            <TouchableOpacity
+              style={styles.quantityButton}
+              onPress={() => setQuantity(prev => (parseInt(prev) + 1).toString())}
+            >
+              <Ionicons name="add" size={24} color="#20B2AA" />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Fiyat (TL):</Text>
+          <View style={styles.quantityContainer}>
+            <TextInput
+              style={[styles.quantityInput, { flex: 1 }]}
+              value={formattedPrice}
+              onChangeText={formatPrice}
+              placeholder="0,00"
+              keyboardType="numeric"
+              textAlign="center"
+            />
+          </View>
+        </View>
+
+        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+          <Text style={styles.saveButtonText}>Kaydet</Text>
+        </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>Kaydet</Text>
-      </TouchableOpacity>
+      <CustomModal
+        visible={modalVisible}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
+        onClose={handleModalClose}
+      />
     </ScrollView>
   );
 };
@@ -171,30 +297,26 @@ const AddProductScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    backgroundColor: '#f5f5f5',
+  },
+  card: {
     backgroundColor: '#fff',
-  },
-  barcodeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-    backgroundColor: '#f8f8f8',
-    padding: 15,
-    borderRadius: 10,
-  },
-  barcodeText: {
-    fontSize: 16,
-    color: '#666',
-    marginLeft: 10,
+    borderRadius: 15,
+    padding: 20,
+    margin: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   inputContainer: {
     marginBottom: 20,
   },
   label: {
     fontSize: 16,
+    color: '#666',
     marginBottom: 8,
-    color: '#333',
-    fontWeight: '500',
   },
   input: {
     borderWidth: 1,
@@ -202,72 +324,83 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    backgroundColor: '#fff',
+    color: '#333',
   },
-  categoryContainer: {
+  pickerContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginBottom: 20,
-    gap: 10,
+    marginHorizontal: -5,
   },
-  categoryButton: {
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 20,
+  pickerItem: {
     borderWidth: 1,
     borderColor: '#ddd',
-    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 8,
+    margin: 5,
+    minWidth: 80,
+    alignItems: 'center',
   },
-  categoryButtonActive: {
-    backgroundColor: '#20B2AA',
+  pickerItemSelected: {
     borderColor: '#20B2AA',
+    borderWidth: 2,
   },
-  categoryButtonText: {
-    color: '#666',
+  pickerItemText: {
     fontSize: 14,
-  },
-  categoryButtonTextActive: {
-    color: '#fff',
-  },
-  sizeContainer: {
-    marginBottom: 20,
-  },
-  sizeButton: {
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    backgroundColor: '#fff',
-    marginRight: 10,
-  },
-  sizeButtonActive: {
-    backgroundColor: '#20B2AA',
-    borderColor: '#20B2AA',
-  },
-  sizeButtonText: {
     color: '#666',
-    fontSize: 14,
   },
-  sizeButtonTextActive: {
-    color: '#fff',
-  },
-  row: {
-    flexDirection: 'row',
-    marginBottom: 20,
+  pickerItemTextSelected: {
+    fontWeight: 'bold',
   },
   saveButton: {
     backgroundColor: '#20B2AA',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 40,
+    marginTop: 20,
   },
   saveButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  quantityContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 5,
+    height: 50,
+  },
+  quantityButton: {
+    padding: 10,
+  },
+  quantityInput: {
+    minWidth: 50,
+    fontSize: 16,
+    color: '#333',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    padding: 10,
+  },
+  barcodeInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 12,
+    backgroundColor: '#f8f8f8',
+  },
+  barcodeIcon: {
+    marginRight: 10,
+  },
+  barcodeInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#333',
+    fontFamily: 'monospace',
   },
 });
 

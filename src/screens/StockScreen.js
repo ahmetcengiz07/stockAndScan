@@ -90,6 +90,13 @@ const StockScreen = ({ navigation, route }) => {
           </View>
         }
       />
+
+      <TouchableOpacity 
+        style={styles.fab}
+        onPress={() => navigation.navigate('AddProduct', { barcode: null })}
+      >
+        <Ionicons name="add" size={30} color="#fff" />
+      </TouchableOpacity>
     </View>
   );
 };
@@ -202,6 +209,22 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
+  },
+  fab: {
+    position: 'absolute',
+    right: 20,
+    bottom: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#20B2AA',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
 });
 

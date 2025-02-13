@@ -3,9 +3,9 @@
 
 
 "@0no-co/graphql.web@^1.0.5":
-  version "1.0.13"
-  resolved "https://registry.yarnpkg.com/@0no-co/graphql.web/-/graphql.web-1.0.13.tgz#978f4d3a869240f2d487fa1c1009028b34bc33b5"
-  integrity sha512-jqYxOevheVTU1S36ZdzAkJIdvRp2m3OYIG5SEoKDw5NI8eVwkoI0D/Q3DYNGmXCxkA6CQuoa7zvMiDPTLqUNuw==
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@0no-co/graphql.web/-/graphql.web-1.1.0.tgz#ed9e7a99b7c7158ef7e98c2db5ecbfbcfa75594b"
+  integrity sha512-Ey/+GWfTlbeHVLMFnoJIfwJMaik2fLhiRrNiGD0sEyISw6IlADs6Gcsk9N2Rl/gWrokiEivkIU2BjT3zChdqQQ==
 
 "@ampproject/remapping@^2.2.0":
   version "2.3.0"
@@ -1976,9 +1976,9 @@
     "@types/istanbul-lib-report" "*"
 
 "@types/node@*":
-  version "22.13.1"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-22.13.1.tgz#a2a3fefbdeb7ba6b89f40371842162fac0934f33"
-  integrity sha512-jK8uzQlrvXqEU91UxiK5J7pKHyzgnI1Qnl0QDHIgVGuolJhRb9EEl28Cj9b3rGR8B2lhFCtvIm5os8lFnO/1Ew==
+  version "22.13.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-22.13.2.tgz#6f401c5ccadac75354f5652128e9fcc3b0cf23b7"
+  integrity sha512-Z+r8y3XL9ZpI2EY52YYygAFmo2/oWfNSj4BCpAXE2McAexDk8VcnBMGC9Djn9gTKt4d2T/hhXqmPzo4hfIXtTg==
   dependencies:
     undici-types "~6.20.0"
 
@@ -2561,9 +2561,9 @@ cacache@^15.3.0:
     unique-filename "^1.1.1"
 
 call-bind-apply-helpers@^1.0.0, call-bind-apply-helpers@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/call-bind-apply-helpers/-/call-bind-apply-helpers-1.0.1.tgz#32e5892e6361b29b0b545ba6f7763378daca2840"
-  integrity sha512-BhYE+WDaywFg2TBWYNXAE+8B1ATnThNBqXHP5nQu0jWJdVvY2hvkpyB3qOmtmDePiS5/BDQ8wASEWGMWRG148g==
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/call-bind-apply-helpers/-/call-bind-apply-helpers-1.0.2.tgz#4b5428c222be985d79c3d82657479dbe0b59b2d6"
+  integrity sha512-Sp1ablJ0ivDkSzjcaJdxEunN5/XvksFJ2sMBFfq6x0ryhQV/2b/KwFe21cMpmHtPOSij8K99/wSfoEuTObmuMQ==
   dependencies:
     es-errors "^1.3.0"
     function-bind "^1.1.2"
@@ -3130,9 +3130,9 @@ ee-first@1.1.1:
   integrity sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==
 
 electron-to-chromium@^1.5.73:
-  version "1.5.97"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.97.tgz#5c4a4744c79e7c85b187adf5160264ac130c776f"
-  integrity sha512-HKLtaH02augM7ZOdYRuO19rWDeY+QSJ1VxnXFa/XDFLf07HvM90pALIJFgrO+UVaajI3+aJMMpojoUTLZyQ7JQ==
+  version "1.5.98"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.5.98.tgz#bdd59c95042fa8f6483893602b1530c8752baebc"
+  integrity sha512-bI/LbtRBxU2GzK7KK5xxFd2y9Lf9XguHooPYbcXWy6wUoT8NMnffsvRhPmSeUHLSDKAEtKuTaEtK4Ms15zkIEA==
 
 emoji-regex@^8.0.0:
   version "8.0.0"
@@ -3621,9 +3621,9 @@ flow-enums-runtime@^0.0.5:
   integrity sha512-PSZF9ZuaZD03sT9YaIs0FrGJ7lSUw7rHZIex+73UYVXg46eL/wxN5PaVcPJFudE2cJu5f0fezitV5aBkLHPUOQ==
 
 flow-parser@0.*:
-  version "0.260.0"
-  resolved "https://registry.yarnpkg.com/flow-parser/-/flow-parser-0.260.0.tgz#ca7c99deef18ba10cdc544bbbc402a43a188efd7"
-  integrity sha512-GvVx+yGdVK4U6Q5AcLCCqVjCyJTeYClOrMYlxhSG7fPNcsiYqtIOIXA+/SaTsvj1kB/xyiwZ5+iOGQXbwaE6Ew==
+  version "0.261.0"
+  resolved "https://registry.yarnpkg.com/flow-parser/-/flow-parser-0.261.0.tgz#53a395977194f61b91bc076fa854f80bd5b1c57d"
+  integrity sha512-b6ffusIxt5dX8QmX6+QCUi8NrbzNZ0C+ynDC8vbe8KbZ7chJjnYGr5ssiiPR2b51vdqUHPay1HB5AhRp6CDc4Q==
 
 flow-parser@^0.206.0:
   version "0.206.0"
