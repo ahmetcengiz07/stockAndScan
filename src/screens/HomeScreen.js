@@ -6,7 +6,8 @@ import { Ionicons } from '@expo/vector-icons';
 const HomeScreen = ({ navigation }) => {
   const { products } = useSelector(state => state.stock);
 
-  const totalProducts = products.length;
+  const totalProducts = products.reduce((sum, product) => sum + product.quantity, 0);
+  const totalVariants = products.length;
   const lowStockProducts = products.filter(p => p.quantity < 5).length;
 
   const categories = [
@@ -39,7 +40,13 @@ const HomeScreen = ({ navigation }) => {
           <View style={styles.statCard}>
             <Ionicons name="cube" size={30} color="#20B2AA" />
             <Text style={styles.statNumber}>{totalProducts}</Text>
-            <Text style={styles.statLabel}>Toplam Ürün</Text>
+            <Text style={styles.statLabel}>Toplam Stok</Text>
+          </View>
+
+          <View style={styles.statCard}>
+            <Ionicons name="apps" size={30} color="#20B2AA" />
+            <Text style={styles.statNumber}>{totalVariants}</Text>
+            <Text style={styles.statLabel}>Ürün Çeşidi</Text>
           </View>
 
           <View style={styles.statCard}>
@@ -113,15 +120,16 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     marginBottom: 30,
+    paddingHorizontal: 5,
   },
   statCard: {
     backgroundColor: '#fff',
-    padding: 20,
+    padding: 15,
     borderRadius: 15,
     alignItems: 'center',
-    width: '45%',
+    width: '31%',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
