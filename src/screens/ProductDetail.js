@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { updateQuantity } from '../redux/slices/stockSlice';
+import { addTransaction } from '../redux/slices/cashSlice';
 import { Ionicons } from '@expo/vector-icons';
 import CustomModal from '../components/CustomModal';
 
@@ -36,6 +37,36 @@ const ProductDetail = ({ route, navigation }) => {
       type: 'success',
     });
     setModalVisible(true);
+  };
+
+  const handleSale = () => {
+    if (currentStock <= 0) {
+      setModalConfig({
+        title: 'Uyarı',
+        message: 'Stokta ürün kalmadı!',
+        type: 'error',
+      });
+      setModalVisible(true);
+      return;
+    }
+
+    // Stoktan düş
+    handleUpdateStock(-1);
+
+    // Kasaya ekle
+    dispatch(
+      addTransaction({
+        productName: product.name,
+        barcode: product.barcode,
+        quantity: 1,
+        amount: product.price,
+        category: product.category,
+        size: product.size,
+        color: product.color,
+        price: product.price,
+        product: product,
+      })
+    );
   };
 
   const handleModalClose = () => {
@@ -110,6 +141,11 @@ const ProductDetail = ({ route, navigation }) => {
             <Text style={styles.buttonText}>Stok Arttır (+1)</Text>
           </TouchableOpacity>
         </View>
+
+        <TouchableOpacity style={styles.saleButton} onPress={handleSale}>
+          <Ionicons name="cart-outline" size={24} color="#fff" style={styles.saleIcon} />
+          <Text style={styles.saleButtonText}>Satış Yap</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.editButton}
@@ -235,6 +271,24 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   editIcon: {
+    marginRight: 4,
+  },
+  saleButton: {
+    backgroundColor: '#4CAF50',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 15,
+    flexDirection: 'row',
+    justifyContent: 'center',
+  },
+  saleButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
+  saleIcon: {
     marginRight: 4,
   },
 });

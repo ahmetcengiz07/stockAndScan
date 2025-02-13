@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
 import store from './src/redux/store';
 import { loadProductsFromStorage } from './src/redux/slices/stockSlice';
+import { loadTransactionsFromStorage } from './src/redux/slices/cashSlice';
 
 import HomeScreen from './src/screens/HomeScreen';
 import ScanScreen from './src/screens/ScanScreen';
@@ -13,6 +14,7 @@ import StockScreen from './src/screens/StockScreen';
 import AddProductScreen from './src/screens/AddProductScreen';
 import ProductDetail from './src/screens/ProductDetail';
 import EditProduct from './src/screens/EditProduct';
+import CashScreen from './src/screens/CashScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -29,6 +31,8 @@ const MainTabs = () => {
             iconName = focused ? 'scan' : 'scan-outline';
           } else if (route.name === 'Stok Listesi') {
             iconName = focused ? 'list' : 'list-outline';
+          } else if (route.name === 'Kasa') {
+            iconName = focused ? 'cash' : 'cash-outline';
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
@@ -36,25 +40,33 @@ const MainTabs = () => {
         tabBarInactiveTintColor: 'gray',
       })}
     >
-      <Tab.Screen 
-        name="Ana Sayfa" 
+      <Tab.Screen
+        name="Ana Sayfa"
         component={HomeScreen}
         options={{
           headerStyle: { backgroundColor: '#20B2AA' },
           headerTintColor: '#fff',
         }}
       />
-      <Tab.Screen 
-        name="Barkod Tara" 
+      <Tab.Screen
+        name="Barkod Tara"
         component={ScanScreen}
         options={{
           headerStyle: { backgroundColor: '#20B2AA' },
           headerTintColor: '#fff',
         }}
       />
-      <Tab.Screen 
-        name="Stok Listesi" 
+      <Tab.Screen
+        name="Stok Listesi"
         component={StockScreen}
+        options={{
+          headerStyle: { backgroundColor: '#20B2AA' },
+          headerTintColor: '#fff',
+        }}
+      />
+      <Tab.Screen
+        name="Kasa"
+        component={CashScreen}
         options={{
           headerStyle: { backgroundColor: '#20B2AA' },
           headerTintColor: '#fff',
@@ -68,13 +80,18 @@ const AppContent = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const savedProducts = await loadProductsFromStorage();
+        const [savedProducts, savedTransactions] = await Promise.all([
+          loadProductsFromStorage(),
+          loadTransactionsFromStorage(),
+        ]);
+
         store.dispatch({ type: 'stock/setProducts', payload: savedProducts });
+        store.dispatch({ type: 'cash/setTransactions', payload: savedTransactions });
       } catch (error) {
         console.error('Error loading initial data:', error);
       }
     };
-    
+
     loadData();
   }, []);
 
@@ -82,8 +99,8 @@ const AppContent = () => {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="MainTabs" component={MainTabs} />
-        <Stack.Screen 
-          name="AddProduct" 
+        <Stack.Screen
+          name="AddProduct"
           component={AddProductScreen}
           options={{
             headerShown: true,
@@ -92,8 +109,8 @@ const AppContent = () => {
             headerTintColor: '#fff',
           }}
         />
-        <Stack.Screen 
-          name="ProductDetail" 
+        <Stack.Screen
+          name="ProductDetail"
           component={ProductDetail}
           options={{
             headerShown: true,
@@ -102,8 +119,8 @@ const AppContent = () => {
             headerTintColor: '#fff',
           }}
         />
-        <Stack.Screen 
-          name="EditProduct" 
+        <Stack.Screen
+          name="EditProduct"
           component={EditProduct}
           options={{
             headerShown: true,
