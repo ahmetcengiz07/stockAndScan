@@ -1,5 +1,17 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  TextInput,
+  Animated,
+  LayoutAnimation,
+  Platform,
+  UIManager,
+  ScrollView,
+} from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -9,6 +21,11 @@ import {
 } from '../redux/slices/cashSlice';
 import { updateQuantity } from '../redux/slices/stockSlice';
 import CustomModal from '../components/CustomModal';
+
+// Android için LayoutAnimation'ı etkinleştir
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 const CashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -23,6 +40,24 @@ const CashScreen = ({ navigation }) => {
     message: '',
     type: 'warning',
   });
+  const [showHint] = useState(new Animated.Value(1));
+  const [isHintVisible, setIsHintVisible] = useState(true);
+
+  React.useEffect(() => {
+    // 2.5 saniye sonra ipucu metnini kaybet
+    Animated.sequence([
+      Animated.delay(2500),
+      Animated.timing(showHint, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      // Animasyon bittiğinde layout animasyonunu başlat ve hint'i gizle
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setIsHintVisible(false);
+    });
+  }, []);
 
   // Filtreleme ve hesaplama fonksiyonları
   const filteredTransactions = useMemo(() => {
@@ -210,7 +245,7 @@ const CashScreen = ({ navigation }) => {
 
   const renderTransaction = ({ item }) => (
     <TouchableOpacity
-      style={styles.transactionCard}
+      style={[styles.transactionCard, isHintVisible && styles.transactionCardWithHint]}
       onLongPress={() => handleCancelTransaction(item)}
       onPress={() => handleTransactionPress(item)}
     >
@@ -232,73 +267,95 @@ const CashScreen = ({ navigation }) => {
           <Text style={styles.multiSaleText}>Çoklu Satış</Text>
         </View>
       )}
+
+      {isHintVisible && (
+        <Animated.View
+          style={[
+            styles.hintContainer,
+            {
+              opacity: showHint,
+              transform: [{ scaleY: showHint }],
+            },
+          ]}
+        >
+          <Animated.View style={{ opacity: showHint }}>
+            <View style={styles.hintContent}>
+              <Ionicons name="information-circle-outline" size={14} color="#666" />
+              <Text style={styles.hintText}>İptal etmek için uzun basın</Text>
+            </View>
+          </Animated.View>
+        </Animated.View>
+      )}
     </TouchableOpacity>
   );
 
   return (
     <View style={styles.container}>
-      <View style={styles.totalCard}>
-        <Text style={styles.totalLabel}>Toplam Kasa</Text>
-        <Text style={styles.totalAmount}>{totalCash.toLocaleString('tr-TR')} TL</Text>
-        {totalCash > 0 && (
-          <TouchableOpacity style={styles.resetButton} onPress={handleResetDaily}>
-            <Ionicons name="refresh-circle" size={24} color="#FF6B6B" />
-            <Text style={styles.resetButtonText}>Günlük Kasayı Sıfırla</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      <View style={styles.filterContainer}>
-        <View style={styles.periodButtons}>
-          {renderPeriodButton('all', 'Tümü')}
-          {renderPeriodButton('today', 'Bugün')}
-          {renderPeriodButton('week', 'Bu Hafta')}
-          {renderPeriodButton('month', 'Bu Ay')}
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        <View style={styles.totalCard}>
+          <Text style={styles.totalLabel}>Toplam Kasa</Text>
+          <Text style={styles.totalAmount}>{totalCash.toLocaleString('tr-TR')} TL</Text>
+          {totalCash > 0 && (
+            <TouchableOpacity style={styles.resetButton} onPress={handleResetDaily}>
+              <Ionicons name="refresh-circle" size={24} color="#FF6B6B" />
+              <Text style={styles.resetButtonText}>Günlük Kasayı Sıfırla</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Ürün ara..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
+        <View style={styles.filterContainer}>
+          <View style={styles.periodButtons}>
+            {renderPeriodButton('all', 'Tümü')}
+            {renderPeriodButton('today', 'Bugün')}
+            {renderPeriodButton('week', 'Bu Hafta')}
+            {renderPeriodButton('month', 'Bu Ay')}
+          </View>
+
+          <View style={styles.searchContainer}>
+            <Ionicons name="search" size={20} color="#666" style={styles.searchIcon} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Ürün ara..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+          </View>
+        </View>
+
+        <View style={styles.statsContainer}>
+          <View style={styles.statCard}>
+            <Text style={styles.statLabel}>İşlem Sayısı</Text>
+            <Text style={styles.statValue}>{periodTotals.count}</Text>
+          </View>
+
+          <View style={styles.statCard}>
+            <Text style={styles.statLabel}>Toplam Adet</Text>
+            <Text style={styles.statValue}>{periodTotals.items}</Text>
+          </View>
+
+          <View style={styles.statCard}>
+            <Text style={styles.statLabel}>Toplam Tutar</Text>
+            <Text style={styles.statValue}>{periodTotals.amount} TL</Text>
+          </View>
+        </View>
+
+        <View style={styles.transactionsContainer}>
+          <Text style={styles.sectionTitle}>Satış Geçmişi</Text>
+          <FlatList
+            data={filteredTransactions}
+            renderItem={renderTransaction}
+            keyExtractor={item => item.id.toString()}
+            contentContainerStyle={styles.list}
+            scrollEnabled={false}
+            ListEmptyComponent={
+              <View style={styles.emptyContainer}>
+                <Ionicons name="cash-outline" size={48} color="#20B2AA" />
+                <Text style={styles.emptyText}>Satış işlemi bulunamadı</Text>
+              </View>
+            }
           />
         </View>
-      </View>
-
-      <View style={styles.statsContainer}>
-        <View style={styles.statCard}>
-          <Text style={styles.statLabel}>İşlem Sayısı</Text>
-          <Text style={styles.statValue}>{periodTotals.count}</Text>
-        </View>
-
-        <View style={styles.statCard}>
-          <Text style={styles.statLabel}>Toplam Adet</Text>
-          <Text style={styles.statValue}>{periodTotals.items}</Text>
-        </View>
-
-        <View style={styles.statCard}>
-          <Text style={styles.statLabel}>Toplam Tutar</Text>
-          <Text style={styles.statValue}>{periodTotals.amount} TL</Text>
-        </View>
-      </View>
-
-      <View style={styles.transactionsContainer}>
-        <Text style={styles.sectionTitle}>Satış Geçmişi</Text>
-        <FlatList
-          data={filteredTransactions}
-          renderItem={renderTransaction}
-          keyExtractor={item => item.id.toString()}
-          contentContainerStyle={styles.list}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Ionicons name="cash-outline" size={48} color="#20B2AA" />
-              <Text style={styles.emptyText}>Satış işlemi bulunamadı</Text>
-            </View>
-          }
-        />
-      </View>
+      </ScrollView>
 
       <CustomModal
         visible={modalVisible}
@@ -316,6 +373,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#f5f5f5',
+  },
+  scrollView: {
+    flex: 1,
   },
   totalCard: {
     backgroundColor: '#fff',
@@ -433,6 +493,9 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
+  transactionCardWithHint: {
+    paddingBottom: 0, // İpucu görünürken padding'i kaldır
+  },
   transactionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -508,6 +571,24 @@ const styles = StyleSheet.create({
     color: '#FF6B6B',
     marginLeft: 5,
     fontWeight: 'bold',
+  },
+  hintContainer: {
+    overflow: 'hidden',
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    marginTop: 10,
+  },
+  hintContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+  },
+  hintText: {
+    fontSize: 12,
+    color: '#666',
+    marginLeft: 5,
+    fontStyle: 'italic',
   },
 });
 

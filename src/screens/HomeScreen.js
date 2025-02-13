@@ -90,7 +90,7 @@ const HomeScreen = ({ navigation }) => {
                               : category === 'Trikolar' || category === 'Sweatler'
                                 ? 'shirt'
                                 : category === 'Çoraplar'
-                                  ? 'footsteps-outline'
+                                  ? 'footsteps'
                                   : category === 'Şapkalar'
                                     ? 'glasses-outline'
                                     : category === 'Zıbınlar'

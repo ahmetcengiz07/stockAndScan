@@ -38,7 +38,7 @@ const StockScreen = ({ navigation, route }) => {
                 : item.category === 'Elbise'
                   ? 'glasses'
                   : item.category === 'Ayakkabı'
-                    ? 'walk'
+                    ? 'walk-outline'
                     : 'shirt-outline'
             }
             size={24}
