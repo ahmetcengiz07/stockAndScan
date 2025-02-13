@@ -7,61 +7,78 @@ const StockScreen = ({ navigation, route }) => {
   const { products } = useSelector(state => state.stock);
   const [searchQuery, setSearchQuery] = useState('');
   const selectedCategory = route.params?.selectedCategory;
+  const showLowStock = route.params?.showLowStock;
 
   const filteredProducts = products
-    .filter(product => !selectedCategory || product.category === selectedCategory)
+    .filter(product => {
+      if (showLowStock) {
+        return product.quantity <= 1;
+      }
+      return !selectedCategory || product.category === selectedCategory;
+    })
     .filter(
       product =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.category.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.productCard}
-      onPress={() => navigation.navigate('ProductDetail', { product: item })}
-    >
-      <View style={styles.productIconContainer}>
-        <Ionicons
-          name={
-            item.category === 'Tulum'
-              ? 'shirt'
-              : item.category === 'Elbise'
-                ? 'glasses'
-                : item.category === 'Ayakkabı'
-                  ? 'walk'
-                  : 'shirt-outline'
-          }
-          size={24}
-          color="#20B2AA"
-        />
-      </View>
-      <View style={styles.productInfo}>
-        <Text style={styles.productName}>{item.name}</Text>
-        <Text style={styles.productDetails}>
-          {item.category} - {item.size} - {item.color}
-        </Text>
-      </View>
-      <View style={styles.quantityContainer}>
-        <Text style={[styles.quantity, item.quantity < 5 ? styles.lowStock : null]}>
-          {item.quantity}
-        </Text>
-        <Text style={styles.price}>{item.price} TL</Text>
-      </View>
-    </TouchableOpacity>
-  );
+  const renderItem = ({ item }) => {
+    const isLowStock = item.quantity <= 1;
+
+    return (
+      <TouchableOpacity
+        style={[styles.productCard, isLowStock && styles.lowStockCard]}
+        onPress={() => navigation.navigate('ProductDetail', { product: item })}
+      >
+        <View style={styles.productIconContainer}>
+          <Ionicons
+            name={
+              item.category === 'Tulum'
+                ? 'shirt'
+                : item.category === 'Elbise'
+                  ? 'glasses'
+                  : item.category === 'Ayakkabı'
+                    ? 'walk'
+                    : 'shirt-outline'
+            }
+            size={24}
+            color={isLowStock ? '#FF6B6B' : '#20B2AA'}
+          />
+        </View>
+        <View style={styles.productInfo}>
+          <Text style={styles.productName}>{item.name}</Text>
+          <Text style={styles.productDetails}>
+            {item.category} - {item.size} - {item.color}
+          </Text>
+          {isLowStock && (
+            <Text style={styles.criticalStockWarning}>
+              Kritik Stok Uyarısı: {item.quantity} adet kaldı!
+            </Text>
+          )}
+        </View>
+        <View style={styles.quantityContainer}>
+          <Text style={[styles.quantity, isLowStock ? styles.lowStock : null]}>
+            {item.quantity}
+          </Text>
+          <Text style={styles.price}>{item.price} TL</Text>
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
-      {selectedCategory && (
+      {(selectedCategory || showLowStock) && (
         <View style={styles.categoryHeader}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => navigation.setParams({ selectedCategory: null })}
+            onPress={() => navigation.setParams({ selectedCategory: null, showLowStock: false })}
           >
             <Ionicons name="close-circle" size={24} color="#666" />
           </TouchableOpacity>
-          <Text style={styles.categoryTitle}>{selectedCategory}</Text>
+          <Text style={styles.categoryTitle}>
+            {showLowStock ? 'Kritik Stok Seviyesindeki Ürünler' : selectedCategory}
+          </Text>
         </View>
       )}
 
@@ -226,6 +243,15 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+  },
+  lowStockCard: {
+    borderWidth: 1,
+    borderColor: '#FF6B6B',
+  },
+  criticalStockWarning: {
+    color: '#FF6B6B',
+    fontSize: 12,
+    marginTop: 4,
   },
 });
 

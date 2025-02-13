@@ -54,6 +54,23 @@ const cashSlice = createSlice({
       state.transactions = action.payload;
       state.totalCash = action.payload.reduce((sum, transaction) => sum + transaction.amount, 0);
     },
+    resetDailyTransactions: state => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // Bugünün işlemlerini filtrele ve toplam tutarı hesapla
+      const dailyTotal = state.transactions
+        .filter(t => new Date(t.date) >= today)
+        .reduce((sum, t) => sum + t.amount, 0);
+
+      // Bugünün işlemlerini kaldır
+      state.transactions = state.transactions.filter(t => new Date(t.date) < today);
+      // Toplam kasadan bugünün tutarını düş
+      state.totalCash -= dailyTotal;
+
+      // AsyncStorage'a kaydet
+      saveTransactionsToStorage(state.transactions);
+    },
   },
 });
 
@@ -82,6 +99,7 @@ export const {
   cancelTransaction,
   cancelMultiSaleTransaction,
   setTransactions,
+  resetDailyTransactions,
 } = cashSlice.actions;
 
 export default cashSlice.reducer;

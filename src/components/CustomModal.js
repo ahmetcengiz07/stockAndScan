@@ -2,28 +2,69 @@ import React from 'react';
 import { View, Text, Modal, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-const CustomModal = ({ visible, title, message, onClose, type = 'success' }) => {
+const CustomModal = ({
+  visible,
+  title,
+  message,
+  onClose,
+  type = 'success',
+  showCancelButton = false,
+}) => {
   return (
-    <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={onClose}>
+    <Modal
+      animationType="fade"
+      transparent={true}
+      visible={visible}
+      onRequestClose={() => onClose(false)}
+    >
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
           <View style={styles.iconContainer}>
             <Ionicons
-              name={type === 'success' ? 'checkmark-circle' : 'alert-circle'}
+              name={
+                type === 'success'
+                  ? 'checkmark-circle'
+                  : type === 'warning'
+                    ? 'alert-circle'
+                    : 'alert-circle'
+              }
               size={50}
-              color={type === 'success' ? '#20B2AA' : '#FF6B6B'}
+              color={type === 'success' ? '#20B2AA' : type === 'warning' ? '#FFA500' : '#FF6B6B'}
             />
           </View>
 
           <Text style={styles.modalTitle}>{title}</Text>
           <Text style={styles.modalText}>{message}</Text>
 
-          <TouchableOpacity
-            style={[styles.button, type === 'success' ? styles.successButton : styles.errorButton]}
-            onPress={onClose}
+          <View
+            style={[
+              styles.buttonContainer,
+              showCancelButton && { justifyContent: 'space-between' },
+            ]}
           >
-            <Text style={styles.buttonText}>Tamam</Text>
-          </TouchableOpacity>
+            {showCancelButton && (
+              <TouchableOpacity
+                style={[styles.button, styles.cancelButton]}
+                onPress={() => onClose(false)}
+              >
+                <Text style={styles.buttonText}>İptal</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity
+              style={[
+                styles.button,
+                type === 'success'
+                  ? styles.successButton
+                  : type === 'warning'
+                    ? styles.warningButton
+                    : styles.errorButton,
+                showCancelButton ? styles.confirmButton : styles.singleButton,
+              ]}
+              onPress={() => onClose(true)}
+            >
+              <Text style={styles.buttonText}>Tamam</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </Modal>
@@ -68,17 +109,36 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '100%',
+  },
   button: {
     borderRadius: 10,
     padding: 12,
-    width: '100%',
     alignItems: 'center',
+    width: '45%',
+  },
+  singleButton: {
+    width: '100%',
+    maxWidth: 200,
   },
   successButton: {
     backgroundColor: '#20B2AA',
   },
+  warningButton: {
+    backgroundColor: '#FFA500',
+  },
   errorButton: {
     backgroundColor: '#FF6B6B',
+  },
+  cancelButton: {
+    backgroundColor: '#666',
+  },
+  confirmButton: {
+    flex: 0,
+    marginLeft: 10,
   },
   buttonText: {
     color: 'white',

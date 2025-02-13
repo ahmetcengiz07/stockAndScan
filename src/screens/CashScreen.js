@@ -1,9 +1,14 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
-import { cancelTransaction, cancelMultiSaleTransaction } from '../redux/slices/cashSlice';
+import {
+  cancelTransaction,
+  cancelMultiSaleTransaction,
+  resetDailyTransactions,
+} from '../redux/slices/cashSlice';
 import { updateQuantity } from '../redux/slices/stockSlice';
+import CustomModal from '../components/CustomModal';
 
 const CashScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -11,6 +16,13 @@ const CashScreen = ({ navigation }) => {
   const { products } = useSelector(state => state.stock);
   const [selectedPeriod, setSelectedPeriod] = useState('all'); // all, today, week, month
   const [searchQuery, setSearchQuery] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [modalConfig, setModalConfig] = useState({
+    title: '',
+    message: '',
+    type: 'warning',
+  });
 
   // Filtreleme ve hesaplama fonksiyonları
   const filteredTransactions = useMemo(() => {
@@ -48,57 +60,106 @@ const CashScreen = ({ navigation }) => {
   }, [filteredTransactions]);
 
   const handleCancelTransaction = transaction => {
-    Alert.alert('Satış İptali', 'Bu satışı iptal etmek istediğinize emin misiniz?', [
-      {
-        text: 'İptal',
-        style: 'cancel',
-      },
-      {
-        text: 'Evet',
-        onPress: () => {
-          if (transaction.isMultiSale) {
-            // Çoklu satış iptali
-            const relatedTransactions = transactions.filter(
-              t => t.multiSaleId === transaction.multiSaleId
-            );
-            const totalAmount = relatedTransactions.reduce((sum, t) => sum + t.amount, 0);
+    setSelectedTransaction(transaction);
+    setModalConfig({
+      title: 'Satış İptali',
+      message: 'Bu satışı iptal etmek istediğinize emin misiniz?',
+      type: 'warning',
+    });
+    setModalVisible(true);
+  };
 
-            dispatch(
-              cancelMultiSaleTransaction({
-                multiSaleId: transaction.multiSaleId,
-                totalAmount,
-              })
-            );
+  const handleResetDaily = () => {
+    setModalConfig({
+      title: 'Günlük Kasa Sıfırlama',
+      message: 'Bugünün kasa geçmişini sıfırlamak istediğinize emin misiniz?',
+      type: 'warning',
+    });
+    setSelectedTransaction('reset');
+    setModalVisible(true);
+  };
 
-            // Her ürün için stok güncelleme
-            relatedTransactions.forEach(t => {
-              dispatch(
-                updateQuantity({
-                  barcode: t.barcode,
-                  quantity: t.quantity, // Stoka geri ekle
-                })
-              );
-            });
-          } else {
-            // Tekli satış iptali
-            dispatch(
-              cancelTransaction({
-                transactionId: transaction.id,
-                amount: transaction.amount,
-              })
-            );
+  const handleModalClose = confirmed => {
+    // Eğer success tipinde bir modal ise sadece kapat
+    if (modalConfig.type === 'success') {
+      setModalVisible(false);
+      setSelectedTransaction(null);
+      return;
+    }
 
-            // Stok güncelleme
+    if (confirmed) {
+      if (selectedTransaction === 'reset') {
+        // Günlük kasa sıfırlama
+        dispatch(resetDailyTransactions());
+        setModalConfig({
+          title: 'Başarılı',
+          message: 'Günlük kasa başarıyla sıfırlandı',
+          type: 'success',
+        });
+        setTimeout(() => {
+          setModalVisible(false);
+          setSelectedTransaction(null);
+        }, 1500);
+        return;
+      }
+
+      if (selectedTransaction) {
+        if (selectedTransaction.isMultiSale) {
+          // Çoklu satış iptali
+          const relatedTransactions = transactions.filter(
+            t => t.multiSaleId === selectedTransaction.multiSaleId
+          );
+          const totalAmount = relatedTransactions.reduce((sum, t) => sum + t.amount, 0);
+
+          dispatch(
+            cancelMultiSaleTransaction({
+              multiSaleId: selectedTransaction.multiSaleId,
+              totalAmount,
+            })
+          );
+
+          // Her ürün için stok güncelleme
+          relatedTransactions.forEach(t => {
             dispatch(
               updateQuantity({
-                barcode: transaction.barcode,
-                quantity: transaction.quantity, // Stoka geri ekle
+                barcode: t.barcode,
+                quantity: t.quantity,
               })
             );
-          }
-        },
-      },
-    ]);
+          });
+        } else {
+          // Tekli satış iptali
+          dispatch(
+            cancelTransaction({
+              transactionId: selectedTransaction.id,
+              amount: selectedTransaction.amount,
+            })
+          );
+
+          // Stok güncelleme
+          dispatch(
+            updateQuantity({
+              barcode: selectedTransaction.barcode,
+              quantity: selectedTransaction.quantity,
+            })
+          );
+        }
+
+        setModalConfig({
+          title: 'Başarılı',
+          message: 'Satış başarıyla iptal edildi',
+          type: 'success',
+        });
+
+        setTimeout(() => {
+          setModalVisible(false);
+          setSelectedTransaction(null);
+        }, 1500);
+      }
+    } else {
+      setModalVisible(false);
+      setSelectedTransaction(null);
+    }
   };
 
   const handleTransactionPress = transaction => {
@@ -179,6 +240,12 @@ const CashScreen = ({ navigation }) => {
       <View style={styles.totalCard}>
         <Text style={styles.totalLabel}>Toplam Kasa</Text>
         <Text style={styles.totalAmount}>{totalCash.toLocaleString('tr-TR')} TL</Text>
+        {totalCash > 0 && (
+          <TouchableOpacity style={styles.resetButton} onPress={handleResetDaily}>
+            <Ionicons name="refresh-circle" size={24} color="#FF6B6B" />
+            <Text style={styles.resetButtonText}>Günlük Kasayı Sıfırla</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <View style={styles.filterContainer}>
@@ -232,6 +299,15 @@ const CashScreen = ({ navigation }) => {
           }
         />
       </View>
+
+      <CustomModal
+        visible={modalVisible}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
+        onClose={handleModalClose}
+        showCancelButton={modalConfig.type === 'warning'}
+      />
     </View>
   );
 };
@@ -417,6 +493,20 @@ const styles = StyleSheet.create({
   multiSaleText: {
     color: '#fff',
     fontSize: 10,
+    fontWeight: 'bold',
+  },
+  resetButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFF0F0',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginTop: 10,
+  },
+  resetButtonText: {
+    color: '#FF6B6B',
+    marginLeft: 5,
     fontWeight: 'bold',
   },
 });

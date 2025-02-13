@@ -8,7 +8,7 @@ const HomeScreen = ({ navigation }) => {
 
   const totalProducts = products.reduce((sum, product) => sum + product.quantity, 0);
   const totalVariants = products.length;
-  const lowStockProducts = products.filter(p => p.quantity < 5).length;
+  const lowStockProducts = products.filter(p => p.quantity <= 1).length;
 
   const categories = [
     'Yenidoğan takımları',
@@ -31,6 +31,10 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate('Stok Listesi', { selectedCategory: category });
   };
 
+  const handleLowStockPress = () => {
+    navigation.navigate('Stok Listesi', { showLowStock: true });
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.content}>
@@ -49,11 +53,17 @@ const HomeScreen = ({ navigation }) => {
             <Text style={styles.statLabel}>Ürün Çeşidi</Text>
           </View>
 
-          <View style={styles.statCard}>
-            <Ionicons name="warning" size={30} color="#20B2AA" />
-            <Text style={styles.statNumber}>{lowStockProducts}</Text>
+          <TouchableOpacity style={styles.statCard} onPress={handleLowStockPress}>
+            <Ionicons
+              name="warning"
+              size={30}
+              color={lowStockProducts > 0 ? '#FF6B6B' : '#20B2AA'}
+            />
+            <Text style={[styles.statNumber, lowStockProducts > 0 && styles.lowStockNumber]}>
+              {lowStockProducts}
+            </Text>
             <Text style={styles.statLabel}>Az Stok</Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.categoriesContainer}>
@@ -129,6 +139,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 15,
     alignItems: 'center',
+    justifyContent: 'center',
     width: '31%',
     shadowColor: '#000',
     shadowOffset: {
@@ -144,11 +155,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     marginTop: 10,
+    textAlign: 'center',
   },
   statLabel: {
     fontSize: 16,
     color: '#666',
     marginTop: 5,
+    textAlign: 'center',
   },
   categoriesContainer: {
     marginTop: 20,
@@ -186,6 +199,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
     textAlign: 'center',
+  },
+  lowStockNumber: {
+    fontWeight: 'bold',
+    color: '#FF6B6B',
   },
 });
 

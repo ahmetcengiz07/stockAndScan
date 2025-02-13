@@ -15,7 +15,10 @@ const stockSlice = createSlice({
       state.products = action.payload;
     },
     addProduct: (state, action) => {
-      state.products.push(action.payload);
+      state.products.push({
+        ...action.payload,
+        criticalStock: action.payload.criticalStock || 1, // Varsayılan kritik stok seviyesi 1 olarak güncellendi
+      });
       // Ürün eklendiğinde AsyncStorage'a kaydet
       saveProductsToStorage(state.products);
     },
@@ -24,6 +27,15 @@ const stockSlice = createSlice({
       const product = state.products.find(p => p.barcode === barcode);
       if (product) {
         product.quantity += quantity;
+        // Güncelleme yapıldığında AsyncStorage'a kaydet
+        saveProductsToStorage(state.products);
+      }
+    },
+    updateCriticalStock: (state, action) => {
+      const { barcode, criticalStock } = action.payload;
+      const product = state.products.find(p => p.barcode === barcode);
+      if (product) {
+        product.criticalStock = criticalStock;
         // Güncelleme yapıldığında AsyncStorage'a kaydet
         saveProductsToStorage(state.products);
       }
@@ -42,7 +54,12 @@ const stockSlice = createSlice({
     updateProduct: (state, action) => {
       const index = state.products.findIndex(p => p.barcode === action.payload.barcode);
       if (index !== -1) {
-        state.products[index] = action.payload;
+        state.products[index] = {
+          ...action.payload,
+          criticalStock: action.payload.criticalStock || state.products[index].criticalStock || 1,
+        };
+        // Güncelleme yapıldığında AsyncStorage'a kaydet
+        saveProductsToStorage(state.products);
       }
     },
   },
@@ -75,6 +92,7 @@ export const {
   setLoading,
   setError,
   updateProduct,
+  updateCriticalStock,
 } = stockSlice.actions;
 
 export default stockSlice.reducer;
