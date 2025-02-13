@@ -514,7 +514,6 @@ const styles = StyleSheet.create({
   barcodeText: {
     fontSize: 12,
     color: '#666',
-    fontFamily: 'monospace',
   },
   date: {
     fontSize: 14,

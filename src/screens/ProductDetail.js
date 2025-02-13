@@ -22,30 +22,32 @@ const ProductDetail = ({ route, navigation }) => {
     if (amount === -1 && currentStock <= 0) {
       setModalConfig({
         title: 'Uyarı',
-        message: "Stok zaten 0'da!",
-        type: 'error',
+        message: "Stok miktarı 0'dan küçük olamaz",
+        type: 'warning',
       });
       setModalVisible(true);
       return;
     }
 
     const newStock = currentStock + amount;
+    if (newStock === 0) {
+      setModalConfig({
+        title: 'Uyarı',
+        message: 'Bu üründe yeterli stok yoktur',
+        type: 'warning',
+      });
+      setModalVisible(true);
+    }
     setCurrentStock(newStock);
     dispatch(updateQuantity({ barcode: product.barcode, quantity: amount }));
-    setModalConfig({
-      title: 'Başarılı',
-      message: `Stok ${amount > 0 ? 'arttırıldı' : 'azaltıldı'}\nGüncel Stok: ${newStock}`,
-      type: 'success',
-    });
-    setModalVisible(true);
   };
 
   const handleSale = () => {
     if (currentStock <= 0) {
       setModalConfig({
         title: 'Uyarı',
-        message: 'Stokta ürün kalmadı!',
-        type: 'error',
+        message: 'Bu üründe yeterli stok yoktur',
+        type: 'warning',
       });
       setModalVisible(true);
       return;
@@ -55,7 +57,7 @@ const ProductDetail = ({ route, navigation }) => {
       setModalConfig({
         title: 'Uyarı',
         message: 'Seçilen miktar stoktan fazla!',
-        type: 'error',
+        type: 'warning',
       });
       setModalVisible(true);
       return;
@@ -142,7 +144,7 @@ const ProductDetail = ({ route, navigation }) => {
 
         <View style={styles.infoRow}>
           <Text style={styles.label}>Fiyat:</Text>
-          <Text style={styles.value}>{product.price} TL</Text>
+          <Text style={styles.value}>{Math.round(product.price)} TL</Text>
         </View>
 
         <View style={styles.saleQuantityContainer}>
@@ -173,7 +175,9 @@ const ProductDetail = ({ route, navigation }) => {
         <TouchableOpacity style={styles.saleButton} onPress={handleSale}>
           <Ionicons name="cart-outline" size={24} color="#fff" style={styles.saleIcon} />
           <Text style={styles.saleButtonText}>
-            {saleQuantity > 1 ? `${saleQuantity} Adet Satış Yap` : 'Satış Yap'}
+            {saleQuantity > 1
+              ? `${saleQuantity} Adet Satış Yap (${Math.round(product.price * saleQuantity)} TL)`
+              : `Satış Yap (${Math.round(product.price)} TL)`}
           </Text>
         </TouchableOpacity>
 
@@ -280,10 +284,8 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   barcodeText: {
-    marginLeft: 10,
-    fontSize: 16,
+    fontSize: 12,
     color: '#666',
-    fontFamily: 'monospace',
   },
   editButton: {
     backgroundColor: '#4a90e2',

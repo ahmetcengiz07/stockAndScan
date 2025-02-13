@@ -1,5 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { useDispatch } from 'react-redux';
 import { updateProduct } from '../redux/slices/stockSlice';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,6 +17,7 @@ import CustomModal from '../components/CustomModal';
 const EditProduct = ({ route, navigation }) => {
   const { product } = route.params;
   const dispatch = useDispatch();
+  const priceInputRef = useRef(null);
 
   const [barcode, setBarcode] = useState(product.barcode);
   const [name, setName] = useState(product.name);
@@ -28,12 +38,10 @@ const EditProduct = ({ route, navigation }) => {
     'Yenidoğan takımları',
     'İkili takımlar',
     'Ceketli takımlar',
-    'Ceketli takımlar',
     'Üçlü takımlar',
     'Tulumlar',
     'Elbiseler',
     'Battaniyeler',
-    ,
     'Bornozlar',
     'Trikolar',
     'Sweatler',
@@ -70,6 +78,7 @@ const EditProduct = ({ route, navigation }) => {
     'Pembe',
     'Gri',
     'Kahverengi',
+    'Diğer',
   ];
 
   const colorCodes = {
@@ -83,32 +92,21 @@ const EditProduct = ({ route, navigation }) => {
     Pembe: '#FFC0CB',
     Gri: '#808080',
     Kahverengi: '#8B4513',
+    Diğer: '#000000',
   };
 
   useEffect(() => {
-    // Fiyatı formatlı şekilde göster
     formatPrice(price);
   }, []);
 
   const formatPrice = value => {
     // Virgül ve noktaları temizle
     const cleanValue = value.replace(/[.,]/g, '');
-    // Son iki rakamı kuruş olarak ayır
-    const length = cleanValue.length;
-    let formattedValue = '';
-
-    if (length <= 2) {
-      formattedValue = '0,' + cleanValue.padStart(2, '0');
-    } else {
-      const lira = cleanValue.slice(0, length - 2);
-      const kurus = cleanValue.slice(length - 2);
-      // Binlik ayracı ekle
-      formattedValue = Number(lira).toLocaleString('tr-TR') + ',' + kurus;
-    }
-
+    // Formatlı değeri ayarla
+    const formattedValue = Number(cleanValue).toLocaleString('tr-TR');
     setFormattedPrice(formattedValue);
     // Gerçek değeri kaydet
-    setPrice((Number(cleanValue) / 100).toString());
+    setPrice(cleanValue);
   };
 
   const handleSave = () => {
@@ -160,154 +158,204 @@ const EditProduct = ({ route, navigation }) => {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.card}>
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Barkod:</Text>
-          <View style={styles.barcodeInputContainer}>
-            <Ionicons name="barcode-outline" size={24} color="#20B2AA" style={styles.barcodeIcon} />
-            <TextInput
-              style={styles.barcodeInput}
-              value={barcode}
-              onChangeText={setBarcode}
-              placeholder="Barkod"
-              keyboardType="numeric"
-            />
-          </View>
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Ürün Adı:</Text>
-          <TextInput
-            style={styles.input}
-            value={name}
-            onChangeText={setName}
-            placeholder="Ürün adı"
-          />
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Kategori:</Text>
-          <View style={styles.pickerContainer}>
-            {categories.map(cat => (
-              <TouchableOpacity
-                key={cat}
-                style={[styles.pickerItem, category === cat && styles.pickerItemSelected]}
-                onPress={() => setCategory(cat)}
-              >
-                <Text
-                  style={[styles.pickerItemText, category === cat && styles.pickerItemTextSelected]}
-                >
-                  {cat}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Beden:</Text>
-          <View style={styles.pickerContainer}>
-            {sizes.map(s => (
-              <TouchableOpacity
-                key={s}
-                style={[styles.pickerItem, size === s && styles.pickerItemSelected]}
-                onPress={() => setSize(s)}
-              >
-                <Text style={[styles.pickerItemText, size === s && styles.pickerItemTextSelected]}>
-                  {s}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Renk:</Text>
-          <View style={styles.pickerContainer}>
-            {colors.map(c => (
-              <TouchableOpacity
-                key={c}
-                style={[
-                  styles.pickerItem,
-                  {
-                    backgroundColor: color === c ? colorCodes[c] : '#fff',
-                    borderColor: color === c ? colorCodes[c] : '#ddd',
-                    borderWidth: color === c ? 3 : 1,
-                  },
-                ]}
-                onPress={() => setColor(c)}
-              >
-                <Text
-                  style={[
-                    styles.pickerItemText,
-                    color === c && styles.pickerItemTextSelected,
-                    color === c && (c === 'Beyaz' || c === 'Sarı')
-                      ? { color: '#333' }
-                      : color === c
-                        ? { color: '#fff' }
-                        : null,
-                  ]}
-                >
-                  {c}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Stok Miktarı:</Text>
-          <View style={styles.quantityContainer}>
-            <TouchableOpacity
-              style={styles.quantityButton}
-              onPress={() => setQuantity(prev => (parseInt(prev) - 1).toString())}
-              disabled={parseInt(quantity) <= 0}
-            >
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+    >
+      <ScrollView
+        style={styles.container}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 50 }}
+      >
+        <View style={styles.card}>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Barkod:</Text>
+            <View style={styles.barcodeInputContainer}>
               <Ionicons
-                name="remove"
+                name="barcode-outline"
                 size={24}
-                color={parseInt(quantity) <= 0 ? '#ccc' : '#20B2AA'}
+                color="#20B2AA"
+                style={styles.barcodeIcon}
               />
-            </TouchableOpacity>
-            <TextInput
-              style={styles.quantityInput}
-              value={quantity}
-              onChangeText={text => {
-                if (text === '' || /^\d+$/.test(text)) {
-                  setQuantity(text);
-                }
-              }}
-              keyboardType="numeric"
-              textAlign="center"
-            />
-            <TouchableOpacity
-              style={styles.quantityButton}
-              onPress={() => setQuantity(prev => (parseInt(prev) + 1).toString())}
-            >
-              <Ionicons name="add" size={24} color="#20B2AA" />
-            </TouchableOpacity>
+              <TextInput
+                style={styles.barcodeInput}
+                value={barcode}
+                onChangeText={setBarcode}
+                placeholder="Barkod"
+                keyboardType="numeric"
+              />
+            </View>
           </View>
-        </View>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Fiyat (TL):</Text>
-          <View style={styles.quantityContainer}>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Ürün Adı:</Text>
             <TextInput
-              style={[styles.quantityInput, { flex: 1 }]}
-              value={formattedPrice}
-              onChangeText={formatPrice}
-              placeholder="0,00"
-              keyboardType="numeric"
-              textAlign="center"
+              style={styles.input}
+              value={name}
+              onChangeText={setName}
+              placeholder="Ürün adı"
             />
           </View>
-        </View>
 
-        <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-          <Text style={styles.saveButtonText}>Kaydet</Text>
-        </TouchableOpacity>
-      </View>
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Kategori:</Text>
+            <View style={styles.pickerContainer}>
+              {categories.map(cat => (
+                <TouchableOpacity
+                  key={cat}
+                  style={[styles.pickerItem, category === cat && styles.pickerItemSelected]}
+                  onPress={() => setCategory(cat)}
+                >
+                  <Text
+                    style={[
+                      styles.pickerItemText,
+                      category === cat && styles.pickerItemTextSelected,
+                    ]}
+                  >
+                    {cat}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Beden:</Text>
+            <View style={styles.pickerContainer}>
+              {sizes.map(s => (
+                <TouchableOpacity
+                  key={s}
+                  style={[styles.pickerItem, size === s && styles.pickerItemSelected]}
+                  onPress={() => setSize(s)}
+                >
+                  <Text
+                    style={[styles.pickerItemText, size === s && styles.pickerItemTextSelected]}
+                  >
+                    {s}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Renk:</Text>
+            <View style={styles.pickerContainer}>
+              {colors.map(c => (
+                <TouchableOpacity
+                  key={c}
+                  style={[
+                    styles.pickerItem,
+                    {
+                      backgroundColor: color === c ? colorCodes[c] : '#fff',
+                      borderColor: color === c ? colorCodes[c] : '#ddd',
+                      borderWidth: color === c ? 3 : 1,
+                    },
+                  ]}
+                  onPress={() => setColor(c)}
+                >
+                  <Text
+                    style={[
+                      styles.pickerItemText,
+                      color === c && styles.pickerItemTextSelected,
+                      color === c && (c === 'Beyaz' || c === 'Sarı')
+                        ? { color: '#333' }
+                        : color === c
+                          ? { color: '#fff' }
+                          : null,
+                    ]}
+                  >
+                    {c}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Fiyat (TL):</Text>
+            <View style={styles.quantityContainer}>
+              <TextInput
+                ref={priceInputRef}
+                style={[styles.quantityInput, { flex: 1 }]}
+                value={formattedPrice}
+                onChangeText={formatPrice}
+                placeholder="0,00"
+                keyboardType="numeric"
+                textAlign="center"
+              />
+            </View>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Stok Miktarı:</Text>
+            <View style={styles.quantityContainer}>
+              <TouchableOpacity
+                style={styles.quantityButton}
+                onPress={() => {
+                  const newQuantity = parseInt(quantity) - 1;
+                  if (newQuantity < 0) {
+                    setModalConfig({
+                      title: 'Uyarı',
+                      message: "Stok miktarı 0'dan küçük olamaz",
+                      type: 'warning',
+                    });
+                    setModalVisible(true);
+                    return;
+                  }
+                  if (newQuantity === 0) {
+                    setModalConfig({
+                      title: 'Uyarı',
+                      message: 'Bu üründe yeterli stok yoktur',
+                      type: 'warning',
+                    });
+                    setModalVisible(true);
+                  }
+                  setQuantity(newQuantity.toString());
+                }}
+                disabled={parseInt(quantity) <= 0}
+              >
+                <Ionicons
+                  name="remove"
+                  size={24}
+                  color={parseInt(quantity) <= 0 ? '#ccc' : '#20B2AA'}
+                />
+              </TouchableOpacity>
+              <TextInput
+                style={styles.quantityInput}
+                value={quantity}
+                onChangeText={text => {
+                  if (text === '' || /^\d+$/.test(text)) {
+                    const newQuantity = parseInt(text || '0');
+                    if (newQuantity === 0) {
+                      setModalConfig({
+                        title: 'Uyarı',
+                        message: 'Bu üründe yeterli stok yoktur',
+                        type: 'warning',
+                      });
+                      setModalVisible(true);
+                    }
+                    setQuantity(text);
+                  }
+                }}
+                keyboardType="numeric"
+                textAlign="center"
+              />
+              <TouchableOpacity
+                style={styles.quantityButton}
+                onPress={() => setQuantity(prev => (parseInt(prev) + 1).toString())}
+              >
+                <Ionicons name="add" size={24} color="#20B2AA" />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+            <Text style={styles.saveButtonText}>Kaydet</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
       <CustomModal
         visible={modalVisible}
         title={modalConfig.title}
@@ -315,7 +363,7 @@ const EditProduct = ({ route, navigation }) => {
         type={modalConfig.type}
         onClose={handleModalClose}
       />
-    </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -425,7 +473,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#333',
-    fontFamily: 'monospace',
   },
 });
 

@@ -75,33 +75,6 @@ const HomeScreen = ({ navigation }) => {
                 style={styles.categoryCard}
                 onPress={() => handleCategoryPress(category)}
               >
-                <Ionicons
-                  name={
-                    category.includes('takım')
-                      ? 'shirt'
-                      : category === 'Tulumlar'
-                        ? 'shirt'
-                        : category === 'Elbiseler'
-                          ? 'shirt-outline'
-                          : category === 'Battaniyeler'
-                            ? 'bed-outline'
-                            : category === 'Bornozlar'
-                              ? 'water-outline'
-                              : category === 'Trikolar' || category === 'Sweatler'
-                                ? 'shirt'
-                                : category === 'Çoraplar'
-                                  ? 'footsteps'
-                                  : category === 'Şapkalar'
-                                    ? 'glasses-outline'
-                                    : category === 'Zıbınlar'
-                                      ? 'shirt-outline'
-                                      : category === 'Tokalar'
-                                        ? 'flower-outline'
-                                        : 'shirt-outline'
-                  }
-                  size={24}
-                  color="#20B2AA"
-                />
                 <Text style={styles.categoryText}>{category}</Text>
               </TouchableOpacity>
             ))}
@@ -183,7 +156,9 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 12,
     alignItems: 'center',
+    justifyContent: 'center',
     width: '48%',
+    height: 60,
     marginBottom: 15,
     shadowColor: '#000',
     shadowOffset: {
@@ -195,7 +170,6 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   categoryText: {
-    marginTop: 8,
     fontSize: 14,
     color: '#333',
     textAlign: 'center',
