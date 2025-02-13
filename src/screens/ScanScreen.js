@@ -30,26 +30,22 @@ const ScanScreen = ({ navigation }) => {
     setScanning(false);
 
     const product = products.find(p => p.barcode === data);
-    
+
     if (product) {
       navigation.navigate('ProductDetail', { product });
     } else {
-      Alert.alert(
-        "Yeni Ürün",
-        "Bu barkoda ait ürün sistemde kayıtlı değil.",
-        [
-          {
-            text: "Ürün Ekle",
-            onPress: () => navigation.navigate('AddProduct', { barcode: data }),
-            style: "default"
-          },
-          {
-            text: "İptal",
-            onPress: () => setScanning(true),
-            style: "cancel"
-          }
-        ]
-      );
+      Alert.alert('Yeni Ürün', 'Bu barkoda ait ürün sistemde kayıtlı değil.', [
+        {
+          text: 'Ürün Ekle',
+          onPress: () => navigation.navigate('AddProduct', { barcode: data }),
+          style: 'default',
+        },
+        {
+          text: 'İptal',
+          onPress: () => setScanning(true),
+          style: 'cancel',
+        },
+      ]);
     }
   };
 
@@ -67,7 +63,7 @@ const ScanScreen = ({ navigation }) => {
       <View style={styles.container}>
         <Ionicons name="warning" size={50} color="#20B2AA" />
         <Text style={styles.permissionText}>Kamera izni reddedildi</Text>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.permissionButton}
           onPress={() => BarCodeScanner.requestPermissionsAsync()}
         >
@@ -92,14 +88,9 @@ const ScanScreen = ({ navigation }) => {
           </View>
         </View>
         <View style={styles.bottomOverlay}>
-          <Text style={styles.instructions}>
-            Barkodu tarama alanına yerleştirin
-          </Text>
+          <Text style={styles.instructions}>Barkodu tarama alanına yerleştirin</Text>
           {!scanning && (
-            <TouchableOpacity 
-              style={styles.rescanButton}
-              onPress={() => setScanning(true)}
-            >
+            <TouchableOpacity style={styles.rescanButton} onPress={() => setScanning(true)}>
               <Text style={styles.rescanButtonText}>Tekrar Tara</Text>
             </TouchableOpacity>
           )}
@@ -218,4 +209,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ScanScreen; 
+export default ScanScreen;

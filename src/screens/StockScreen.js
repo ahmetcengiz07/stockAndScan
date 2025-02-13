@@ -9,26 +9,31 @@ const StockScreen = ({ navigation, route }) => {
   const selectedCategory = route.params?.selectedCategory;
 
   const filteredProducts = products
-    .filter(product => 
-      !selectedCategory || product.category === selectedCategory
-    )
-    .filter(product => 
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchQuery.toLowerCase())
+    .filter(product => !selectedCategory || product.category === selectedCategory)
+    .filter(
+      product =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.category.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={styles.productCard}
       onPress={() => navigation.navigate('ProductDetail', { product: item })}
     >
       <View style={styles.productIconContainer}>
-        <Ionicons 
-          name={item.category === 'Tulum' ? 'shirt' : 
-                item.category === 'Elbise' ? 'glasses' : 
-                item.category === 'Ayakkabı' ? 'walk' : 'shirt-outline'} 
-          size={24} 
-          color="#20B2AA" 
+        <Ionicons
+          name={
+            item.category === 'Tulum'
+              ? 'shirt'
+              : item.category === 'Elbise'
+                ? 'glasses'
+                : item.category === 'Ayakkabı'
+                  ? 'walk'
+                  : 'shirt-outline'
+          }
+          size={24}
+          color="#20B2AA"
         />
       </View>
       <View style={styles.productInfo}>
@@ -38,10 +43,7 @@ const StockScreen = ({ navigation, route }) => {
         </Text>
       </View>
       <View style={styles.quantityContainer}>
-        <Text style={[
-          styles.quantity,
-          item.quantity < 5 ? styles.lowStock : null
-        ]}>
+        <Text style={[styles.quantity, item.quantity < 5 ? styles.lowStock : null]}>
           {item.quantity}
         </Text>
         <Text style={styles.price}>{item.price} TL</Text>
@@ -53,7 +55,7 @@ const StockScreen = ({ navigation, route }) => {
     <View style={styles.container}>
       {selectedCategory && (
         <View style={styles.categoryHeader}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.backButton}
             onPress={() => navigation.setParams({ selectedCategory: null })}
           >
@@ -72,7 +74,7 @@ const StockScreen = ({ navigation, route }) => {
           onChangeText={setSearchQuery}
         />
       </View>
-      
+
       <FlatList
         data={filteredProducts}
         renderItem={renderItem}
@@ -82,16 +84,15 @@ const StockScreen = ({ navigation, route }) => {
           <View style={styles.emptyContainer}>
             <Ionicons name="alert-circle-outline" size={48} color="#20B2AA" />
             <Text style={styles.emptyText}>
-              {selectedCategory 
+              {selectedCategory
                 ? `${selectedCategory} kategorisinde ürün bulunamadı`
-                : 'Ürün bulunamadı'
-              }
+                : 'Ürün bulunamadı'}
             </Text>
           </View>
         }
       />
 
-      <TouchableOpacity 
+      <TouchableOpacity
         style={styles.fab}
         onPress={() => navigation.navigate('AddProduct', { barcode: null })}
       >
@@ -228,4 +229,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default StockScreen; 
+export default StockScreen;

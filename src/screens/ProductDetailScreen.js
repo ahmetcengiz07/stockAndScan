@@ -4,9 +4,7 @@ import { useSelector } from 'react-redux';
 
 const ProductDetailScreen = ({ route }) => {
   const { productId } = route.params;
-  const product = useSelector(state => 
-    state.products.items.find(item => item.id === productId)
-  );
+  const product = useSelector(state => state.products.items.find(item => item.id === productId));
 
   return (
     <View style={styles.container}>
@@ -35,4 +33,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProductDetailScreen; 
+export default ProductDetailScreen;

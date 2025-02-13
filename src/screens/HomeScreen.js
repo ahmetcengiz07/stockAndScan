@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
 
 const HomeScreen = ({ navigation }) => {
-  const { products } = useSelector((state) => state.stock);
+  const { products } = useSelector(state => state.stock);
 
   const totalProducts = products.length;
   const lowStockProducts = products.filter(p => p.quantity < 5).length;
@@ -23,10 +23,10 @@ const HomeScreen = ({ navigation }) => {
     'Çoraplar',
     'Şapkalar',
     'Zıbınlar',
-    'Tokalar'
+    'Tokalar',
   ];
 
-  const handleCategoryPress = (category) => {
+  const handleCategoryPress = category => {
     navigation.navigate('Stok Listesi', { selectedCategory: category });
   };
 
@@ -34,14 +34,14 @@ const HomeScreen = ({ navigation }) => {
     <ScrollView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.welcomeText}>Hoş Geldiniz</Text>
-        
+
         <View style={styles.statsContainer}>
           <View style={styles.statCard}>
             <Ionicons name="cube" size={30} color="#20B2AA" />
             <Text style={styles.statNumber}>{totalProducts}</Text>
             <Text style={styles.statLabel}>Toplam Ürün</Text>
           </View>
-          
+
           <View style={styles.statCard}>
             <Ionicons name="warning" size={30} color="#20B2AA" />
             <Text style={styles.statNumber}>{lowStockProducts}</Text>
@@ -52,27 +52,38 @@ const HomeScreen = ({ navigation }) => {
         <View style={styles.categoriesContainer}>
           <Text style={styles.sectionTitle}>Kategoriler</Text>
           <View style={styles.categoryGrid}>
-            {categories.map((category) => (
-              <TouchableOpacity 
+            {categories.map(category => (
+              <TouchableOpacity
                 key={category}
                 style={styles.categoryCard}
                 onPress={() => handleCategoryPress(category)}
               >
-                <Ionicons 
+                <Ionicons
                   name={
-                    category.includes('takım') ? 'shirt' :
-                    category === 'Tulumlar' ? 'shirt' :
-                    category === 'Elbiseler' ? 'shirt-outline' :
-                    category === 'Battaniyeler' ? 'bed-outline' :
-                    category === 'Bornozlar' ? 'water-outline' :
-                    category === 'Trikolar' || category === 'Sweatler' ? 'shirt' :
-                    category === 'Çoraplar' ? 'footsteps-outline' :
-                    category === 'Şapkalar' ? 'glasses-outline' :
-                    category === 'Zıbınlar' ? 'shirt-outline' :
-                    category === 'Tokalar' ? 'flower-outline' : 'shirt-outline'
-                  } 
-                  size={24} 
-                  color="#20B2AA" 
+                    category.includes('takım')
+                      ? 'shirt'
+                      : category === 'Tulumlar'
+                        ? 'shirt'
+                        : category === 'Elbiseler'
+                          ? 'shirt-outline'
+                          : category === 'Battaniyeler'
+                            ? 'bed-outline'
+                            : category === 'Bornozlar'
+                              ? 'water-outline'
+                              : category === 'Trikolar' || category === 'Sweatler'
+                                ? 'shirt'
+                                : category === 'Çoraplar'
+                                  ? 'footsteps-outline'
+                                  : category === 'Şapkalar'
+                                    ? 'glasses-outline'
+                                    : category === 'Zıbınlar'
+                                      ? 'shirt-outline'
+                                      : category === 'Tokalar'
+                                        ? 'flower-outline'
+                                        : 'shirt-outline'
+                  }
+                  size={24}
+                  color="#20B2AA"
                 />
                 <Text style={styles.categoryText}>{category}</Text>
               </TouchableOpacity>
@@ -170,4 +181,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen; 
+export default HomeScreen;

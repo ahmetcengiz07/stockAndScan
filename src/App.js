@@ -16,24 +16,16 @@ const App = () => {
     <Provider store={store}>
       <NavigationContainer>
         <Stack.Navigator>
-          <Stack.Screen 
-            name="Home" 
-            component={HomeScreen} 
+          <Stack.Screen
+            name="Home"
+            component={HomeScreen}
             options={{ title: 'Bebek Giyim Stok Takip' }}
           />
-          <Stack.Screen 
-            name="Scan" 
-            component={ScanScreen} 
-            options={{ title: 'Barkod Tara' }}
-          />
-          <Stack.Screen 
-            name="Stock" 
-            component={StockScreen} 
-            options={{ title: 'Stok Listesi' }}
-          />
-          <Stack.Screen 
-            name="AddProduct" 
-            component={AddProductScreen} 
+          <Stack.Screen name="Scan" component={ScanScreen} options={{ title: 'Barkod Tara' }} />
+          <Stack.Screen name="Stock" component={StockScreen} options={{ title: 'Stok Listesi' }} />
+          <Stack.Screen
+            name="AddProduct"
+            component={AddProductScreen}
             options={{ title: 'Yeni Ürün Ekle' }}
           />
         </Stack.Navigator>
@@ -42,4 +34,4 @@ const App = () => {
   );
 };
 
-export default App; 
+export default App;

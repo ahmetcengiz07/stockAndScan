@@ -4,25 +4,20 @@ import { Ionicons } from '@expo/vector-icons';
 
 const CustomModal = ({ visible, title, message, onClose, type = 'success' }) => {
   return (
-    <Modal
-      animationType="fade"
-      transparent={true}
-      visible={visible}
-      onRequestClose={onClose}
-    >
+    <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={onClose}>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
           <View style={styles.iconContainer}>
-            <Ionicons 
-              name={type === 'success' ? 'checkmark-circle' : 'alert-circle'} 
-              size={50} 
-              color={type === 'success' ? '#20B2AA' : '#FF6B6B'} 
+            <Ionicons
+              name={type === 'success' ? 'checkmark-circle' : 'alert-circle'}
+              size={50}
+              color={type === 'success' ? '#20B2AA' : '#FF6B6B'}
             />
           </View>
-          
+
           <Text style={styles.modalTitle}>{title}</Text>
           <Text style={styles.modalText}>{message}</Text>
-          
+
           <TouchableOpacity
             style={[styles.button, type === 'success' ? styles.successButton : styles.errorButton]}
             onPress={onClose}
@@ -92,4 +87,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CustomModal; 
+export default CustomModal;

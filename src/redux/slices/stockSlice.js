@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const initialState = {
   products: [],
   loading: false,
-  error: null
+  error: null,
 };
 
 const stockSlice = createSlice({
@@ -44,12 +44,12 @@ const stockSlice = createSlice({
       if (index !== -1) {
         state.products[index] = action.payload;
       }
-    }
-  }
+    },
+  },
 });
 
 // AsyncStorage fonksiyonları
-const saveProductsToStorage = async (products) => {
+const saveProductsToStorage = async products => {
   try {
     await AsyncStorage.setItem('products', JSON.stringify(products));
   } catch (error) {
@@ -67,14 +67,14 @@ export const loadProductsFromStorage = async () => {
   }
 };
 
-export const { 
-  setProducts, 
-  addProduct, 
-  updateQuantity, 
-  removeProduct, 
-  setLoading, 
-  setError, 
-  updateProduct 
+export const {
+  setProducts,
+  addProduct,
+  updateQuantity,
+  removeProduct,
+  setLoading,
+  setError,
+  updateProduct,
 } = stockSlice.actions;
 
-export default stockSlice.reducer; 
+export default stockSlice.reducer;

@@ -12,28 +12,28 @@ const ProductDetail = ({ route, navigation }) => {
   const [modalConfig, setModalConfig] = useState({
     title: '',
     message: '',
-    type: 'success'
+    type: 'success',
   });
   const [currentStock, setCurrentStock] = useState(product.quantity);
 
-  const handleUpdateStock = (amount) => {
+  const handleUpdateStock = amount => {
     if (amount === -1 && currentStock <= 0) {
       setModalConfig({
         title: 'Uyarı',
         message: "Stok zaten 0'da!",
-        type: 'error'
+        type: 'error',
       });
       setModalVisible(true);
       return;
     }
-    
+
     const newStock = currentStock + amount;
     setCurrentStock(newStock);
     dispatch(updateQuantity({ barcode: product.barcode, quantity: amount }));
     setModalConfig({
       title: 'Başarılı',
       message: `Stok ${amount > 0 ? 'arttırıldı' : 'azaltıldı'}\nGüncel Stok: ${newStock}`,
-      type: 'success'
+      type: 'success',
     });
     setModalVisible(true);
   };
@@ -49,12 +49,18 @@ const ProductDetail = ({ route, navigation }) => {
     <View style={styles.container}>
       <View style={styles.card}>
         <View style={styles.header}>
-          <Ionicons 
-            name={product.category === 'Tulum' ? 'shirt' : 
-                  product.category === 'Elbise' ? 'glasses' : 
-                  product.category === 'Ayakkabı' ? 'walk' : 'shirt-outline'} 
-            size={40} 
-            color="#20B2AA" 
+          <Ionicons
+            name={
+              product.category === 'Tulum'
+                ? 'shirt'
+                : product.category === 'Elbise'
+                  ? 'glasses'
+                  : product.category === 'Ayakkabı'
+                    ? 'walk'
+                    : 'shirt-outline'
+            }
+            size={40}
+            color="#20B2AA"
           />
           <Text style={styles.title}>{product.name}</Text>
         </View>
@@ -90,14 +96,14 @@ const ProductDetail = ({ route, navigation }) => {
         </View>
 
         <View style={styles.buttonContainer}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.button, styles.decreaseButton]}
             onPress={() => handleUpdateStock(-1)}
           >
             <Text style={styles.buttonText}>Stok Azalt (-1)</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.button, styles.increaseButton]}
             onPress={() => handleUpdateStock(1)}
           >
@@ -105,7 +111,7 @@ const ProductDetail = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.editButton}
           onPress={() => navigation.navigate('EditProduct', { product })}
         >
@@ -233,4 +239,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProductDetail; 
+export default ProductDetail;

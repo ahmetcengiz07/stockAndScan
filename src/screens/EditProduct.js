@@ -21,25 +21,26 @@ const EditProduct = ({ route, navigation }) => {
   const [modalConfig, setModalConfig] = useState({
     title: '',
     message: '',
-    type: 'success'
+    type: 'success',
   });
 
   const categories = [
-    'Yenidoğan takımları'
-    , 'İkili takımlar'
-    , 'Ceketli takımlar'
-    , 'Ceketli takımlar'
-    , 'Üçlü takımlar'
-    , 'Tulumlar'
-    , 'Elbiseler'
-    , 'Battaniyeler',
-    , "Bornozlar"
-    , "Trikolar"
-    , "Sweatler"
-    , 'Çoraplar'
-    , 'Şapkalar'
-    , 'Zıbınlar'
-    , "Tokalar"
+    'Yenidoğan takımları',
+    'İkili takımlar',
+    'Ceketli takımlar',
+    'Ceketli takımlar',
+    'Üçlü takımlar',
+    'Tulumlar',
+    'Elbiseler',
+    'Battaniyeler',
+    ,
+    'Bornozlar',
+    'Trikolar',
+    'Sweatler',
+    'Çoraplar',
+    'Şapkalar',
+    'Zıbınlar',
+    'Tokalar',
   ];
   const sizes = [
     'Yeni Doğan',
@@ -58,19 +59,30 @@ const EditProduct = ({ route, navigation }) => {
     '8 Yaş',
     '9 Yaş',
   ];
-  const colors = ['Siyah', 'Beyaz', 'Kırmızı', 'Mavi', 'Yeşil', 'Sarı', 'Mor', 'Pembe', 'Gri', 'Kahverengi'];
+  const colors = [
+    'Siyah',
+    'Beyaz',
+    'Kırmızı',
+    'Mavi',
+    'Yeşil',
+    'Sarı',
+    'Mor',
+    'Pembe',
+    'Gri',
+    'Kahverengi',
+  ];
 
   const colorCodes = {
-    'Siyah': '#000000',
-    'Beyaz': '#FFFFFF',
-    'Kırmızı': '#FF0000',
-    'Mavi': '#0000FF',
-    'Yeşil': '#008000',
-    'Sarı': '#FFFF00',
-    'Mor': '#800080',
-    'Pembe': '#FFC0CB',
-    'Gri': '#808080',
-    'Kahverengi': '#8B4513'
+    Siyah: '#000000',
+    Beyaz: '#FFFFFF',
+    Kırmızı: '#FF0000',
+    Mavi: '#0000FF',
+    Yeşil: '#008000',
+    Sarı: '#FFFF00',
+    Mor: '#800080',
+    Pembe: '#FFC0CB',
+    Gri: '#808080',
+    Kahverengi: '#8B4513',
   };
 
   useEffect(() => {
@@ -78,7 +90,7 @@ const EditProduct = ({ route, navigation }) => {
     formatPrice(price);
   }, []);
 
-  const formatPrice = (value) => {
+  const formatPrice = value => {
     // Virgül ve noktaları temizle
     const cleanValue = value.replace(/[.,]/g, '');
     // Son iki rakamı kuruş olarak ayır
@@ -104,7 +116,7 @@ const EditProduct = ({ route, navigation }) => {
       setModalConfig({
         title: 'Hata',
         message: 'Lütfen tüm alanları doldurun',
-        type: 'error'
+        type: 'error',
       });
       setModalVisible(true);
       return;
@@ -114,7 +126,7 @@ const EditProduct = ({ route, navigation }) => {
       setModalConfig({
         title: 'Hata',
         message: 'Lütfen geçerli bir stok miktarı girin',
-        type: 'error'
+        type: 'error',
       });
       setModalVisible(true);
       return;
@@ -128,14 +140,14 @@ const EditProduct = ({ route, navigation }) => {
       size,
       color,
       price: parseFloat(price),
-      quantity: parseInt(quantity)
+      quantity: parseInt(quantity),
     };
 
     dispatch(updateProduct(updatedProduct));
     setModalConfig({
       title: 'Başarılı',
       message: 'Ürün başarıyla güncellendi',
-      type: 'success'
+      type: 'success',
     });
     setModalVisible(true);
   };
@@ -177,19 +189,17 @@ const EditProduct = ({ route, navigation }) => {
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Kategori:</Text>
           <View style={styles.pickerContainer}>
-            {categories.map((cat) => (
+            {categories.map(cat => (
               <TouchableOpacity
                 key={cat}
-                style={[
-                  styles.pickerItem,
-                  category === cat && styles.pickerItemSelected
-                ]}
+                style={[styles.pickerItem, category === cat && styles.pickerItemSelected]}
                 onPress={() => setCategory(cat)}
               >
-                <Text style={[
-                  styles.pickerItemText,
-                  category === cat && styles.pickerItemTextSelected
-                ]}>{cat}</Text>
+                <Text
+                  style={[styles.pickerItemText, category === cat && styles.pickerItemTextSelected]}
+                >
+                  {cat}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -198,19 +208,15 @@ const EditProduct = ({ route, navigation }) => {
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Beden:</Text>
           <View style={styles.pickerContainer}>
-            {sizes.map((s) => (
+            {sizes.map(s => (
               <TouchableOpacity
                 key={s}
-                style={[
-                  styles.pickerItem,
-                  size === s && styles.pickerItemSelected
-                ]}
+                style={[styles.pickerItem, size === s && styles.pickerItemSelected]}
                 onPress={() => setSize(s)}
               >
-                <Text style={[
-                  styles.pickerItemText,
-                  size === s && styles.pickerItemTextSelected
-                ]}>{s}</Text>
+                <Text style={[styles.pickerItemText, size === s && styles.pickerItemTextSelected]}>
+                  {s}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -219,7 +225,7 @@ const EditProduct = ({ route, navigation }) => {
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Renk:</Text>
           <View style={styles.pickerContainer}>
-            {colors.map((c) => (
+            {colors.map(c => (
               <TouchableOpacity
                 key={c}
                 style={[
@@ -227,16 +233,24 @@ const EditProduct = ({ route, navigation }) => {
                   {
                     backgroundColor: color === c ? colorCodes[c] : '#fff',
                     borderColor: color === c ? colorCodes[c] : '#ddd',
-                    borderWidth: color === c ? 3 : 1
-                  }
+                    borderWidth: color === c ? 3 : 1,
+                  },
                 ]}
                 onPress={() => setColor(c)}
               >
-                <Text style={[
-                  styles.pickerItemText,
-                  color === c && styles.pickerItemTextSelected,
-                  color === c && (c === 'Beyaz' || c === 'Sarı') ? { color: '#333' } : color === c ? { color: '#fff' } : null
-                ]}>{c}</Text>
+                <Text
+                  style={[
+                    styles.pickerItemText,
+                    color === c && styles.pickerItemTextSelected,
+                    color === c && (c === 'Beyaz' || c === 'Sarı')
+                      ? { color: '#333' }
+                      : color === c
+                        ? { color: '#fff' }
+                        : null,
+                  ]}
+                >
+                  {c}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -250,12 +264,16 @@ const EditProduct = ({ route, navigation }) => {
               onPress={() => setQuantity(prev => (parseInt(prev) - 1).toString())}
               disabled={parseInt(quantity) <= 0}
             >
-              <Ionicons name="remove" size={24} color={parseInt(quantity) <= 0 ? '#ccc' : '#20B2AA'} />
+              <Ionicons
+                name="remove"
+                size={24}
+                color={parseInt(quantity) <= 0 ? '#ccc' : '#20B2AA'}
+              />
             </TouchableOpacity>
             <TextInput
               style={styles.quantityInput}
               value={quantity}
-              onChangeText={(text) => {
+              onChangeText={text => {
                 if (text === '' || /^\d+$/.test(text)) {
                   setQuantity(text);
                 }
@@ -411,4 +429,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EditProduct; 
+export default EditProduct;

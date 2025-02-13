@@ -32,7 +32,7 @@ const productSlice = createSlice({
 });
 
 // AsyncStorage fonksiyonları
-export const saveProductsToStorage = async (products) => {
+export const saveProductsToStorage = async products => {
   try {
     await AsyncStorage.setItem('products', JSON.stringify(products));
   } catch (error) {
@@ -51,4 +51,4 @@ export const loadProductsFromStorage = async () => {
 };
 
 export const { setProducts, addProduct, updateProduct, deleteProduct } = productSlice.actions;
-export default productSlice.reducer; 
+export default productSlice.reducer;

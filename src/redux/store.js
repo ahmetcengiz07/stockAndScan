@@ -3,8 +3,8 @@ import stockReducer from './slices/stockSlice';
 
 const store = configureStore({
   reducer: {
-    stock: stockReducer
-  }
+    stock: stockReducer,
+  },
 });
 
 export default store;

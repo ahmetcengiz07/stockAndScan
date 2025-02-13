@@ -41,8 +41,8 @@ const BarcodeScreen = () => {
         zoom={zoom}
         ratio="16:9"
       />
-      
-      <TouchableOpacity 
+
+      <TouchableOpacity
         style={styles.resetButton}
         onPress={() => {
           setZoom(0);
@@ -76,5 +76,5 @@ const styles = StyleSheet.create({
   resetText: {
     color: 'white',
     fontSize: 16,
-  }
-}); 
+  },
+});
