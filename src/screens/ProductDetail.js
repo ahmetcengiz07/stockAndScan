@@ -16,6 +16,7 @@ const ProductDetail = ({ route, navigation }) => {
     type: 'success',
   });
   const [currentStock, setCurrentStock] = useState(product.quantity);
+  const [saleQuantity, setSaleQuantity] = useState(1);
 
   const handleUpdateStock = amount => {
     if (amount === -1 && currentStock <= 0) {
@@ -50,16 +51,27 @@ const ProductDetail = ({ route, navigation }) => {
       return;
     }
 
+    if (saleQuantity > currentStock) {
+      setModalConfig({
+        title: 'Uyarı',
+        message: 'Seçilen miktar stoktan fazla!',
+        type: 'error',
+      });
+      setModalVisible(true);
+      return;
+    }
+
     // Stoktan düş
-    handleUpdateStock(-1);
+    dispatch(updateQuantity({ barcode: product.barcode, quantity: -saleQuantity }));
+    setCurrentStock(prev => prev - saleQuantity);
 
     // Kasaya ekle
     dispatch(
       addTransaction({
         productName: product.name,
         barcode: product.barcode,
-        quantity: 1,
-        amount: product.price,
+        quantity: saleQuantity,
+        amount: product.price * saleQuantity,
         category: product.category,
         size: product.size,
         color: product.color,
@@ -67,6 +79,13 @@ const ProductDetail = ({ route, navigation }) => {
         product: product,
       })
     );
+
+    setModalConfig({
+      title: 'Başarılı',
+      message: `${saleQuantity} adet ürün satışı yapıldı`,
+      type: 'success',
+    });
+    setModalVisible(true);
   };
 
   const handleModalClose = () => {
@@ -126,25 +145,36 @@ const ProductDetail = ({ route, navigation }) => {
           <Text style={styles.value}>{product.price} TL</Text>
         </View>
 
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[styles.button, styles.decreaseButton]}
-            onPress={() => handleUpdateStock(-1)}
-          >
-            <Text style={styles.buttonText}>Stok Azalt (-1)</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.button, styles.increaseButton]}
-            onPress={() => handleUpdateStock(1)}
-          >
-            <Text style={styles.buttonText}>Stok Arttır (+1)</Text>
-          </TouchableOpacity>
+        <View style={styles.saleQuantityContainer}>
+          <Text style={styles.label}>Satış Adedi:</Text>
+          <View style={styles.quantityContainer}>
+            <TouchableOpacity
+              style={styles.quantityButton}
+              onPress={() => setSaleQuantity(prev => Math.max(1, prev - 1))}
+              disabled={saleQuantity <= 1}
+            >
+              <Ionicons name="remove" size={24} color={saleQuantity <= 1 ? '#ccc' : '#20B2AA'} />
+            </TouchableOpacity>
+            <Text style={styles.quantityText}>{saleQuantity}</Text>
+            <TouchableOpacity
+              style={styles.quantityButton}
+              onPress={() => setSaleQuantity(prev => Math.min(currentStock, prev + 1))}
+              disabled={saleQuantity >= currentStock}
+            >
+              <Ionicons
+                name="add"
+                size={24}
+                color={saleQuantity >= currentStock ? '#ccc' : '#20B2AA'}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
 
         <TouchableOpacity style={styles.saleButton} onPress={handleSale}>
           <Ionicons name="cart-outline" size={24} color="#fff" style={styles.saleIcon} />
-          <Text style={styles.saleButtonText}>Satış Yap</Text>
+          <Text style={styles.saleButtonText}>
+            {saleQuantity > 1 ? `${saleQuantity} Adet Satış Yap` : 'Satış Yap'}
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -290,6 +320,28 @@ const styles = StyleSheet.create({
   },
   saleIcon: {
     marginRight: 4,
+  },
+  saleQuantityContainer: {
+    marginTop: 15,
+    marginBottom: 10,
+  },
+  quantityContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f8f8f8',
+    borderRadius: 8,
+    padding: 5,
+    marginTop: 5,
+  },
+  quantityButton: {
+    padding: 10,
+  },
+  quantityText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    paddingHorizontal: 20,
   },
 });
 

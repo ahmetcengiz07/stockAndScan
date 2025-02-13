@@ -38,40 +38,21 @@ const MainTabs = () => {
         },
         tabBarActiveTintColor: '#20B2AA',
         tabBarInactiveTintColor: 'gray',
+        headerStyle: { backgroundColor: '#20B2AA' },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+          alignSelf: 'center',
+          textAlign: 'center',
+          flex: 1,
+        },
+        headerTitleAlign: 'center',
       })}
     >
-      <Tab.Screen
-        name="Ana Sayfa"
-        component={HomeScreen}
-        options={{
-          headerStyle: { backgroundColor: '#20B2AA' },
-          headerTintColor: '#fff',
-        }}
-      />
-      <Tab.Screen
-        name="Barkod Tara"
-        component={ScanScreen}
-        options={{
-          headerStyle: { backgroundColor: '#20B2AA' },
-          headerTintColor: '#fff',
-        }}
-      />
-      <Tab.Screen
-        name="Stok Listesi"
-        component={StockScreen}
-        options={{
-          headerStyle: { backgroundColor: '#20B2AA' },
-          headerTintColor: '#fff',
-        }}
-      />
-      <Tab.Screen
-        name="Kasa"
-        component={CashScreen}
-        options={{
-          headerStyle: { backgroundColor: '#20B2AA' },
-          headerTintColor: '#fff',
-        }}
-      />
+      <Tab.Screen name="Ana Sayfa" component={HomeScreen} />
+      <Tab.Screen name="Barkod Tara" component={ScanScreen} />
+      <Tab.Screen name="Stok Listesi" component={StockScreen} />
+      <Tab.Screen name="Kasa" component={CashScreen} />
     </Tab.Navigator>
   );
 };
@@ -97,7 +78,20 @@ const AppContent = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          headerStyle: { backgroundColor: '#20B2AA' },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            alignSelf: 'center',
+            textAlign: 'center',
+            flex: 1,
+          },
+          headerTitleAlign: 'center',
+        }}
+      >
         <Stack.Screen name="MainTabs" component={MainTabs} />
         <Stack.Screen
           name="AddProduct"
@@ -105,8 +99,6 @@ const AppContent = () => {
           options={{
             headerShown: true,
             title: 'Yeni Ürün Ekle',
-            headerStyle: { backgroundColor: '#20B2AA' },
-            headerTintColor: '#fff',
           }}
         />
         <Stack.Screen
@@ -115,8 +107,6 @@ const AppContent = () => {
           options={{
             headerShown: true,
             title: 'Ürün Detayı',
-            headerStyle: { backgroundColor: '#20B2AA' },
-            headerTintColor: '#fff',
           }}
         />
         <Stack.Screen
@@ -125,8 +115,6 @@ const AppContent = () => {
           options={{
             headerShown: true,
             title: 'Ürün Düzenle',
-            headerStyle: { backgroundColor: '#20B2AA' },
-            headerTintColor: '#fff',
           }}
         />
       </Stack.Navigator>

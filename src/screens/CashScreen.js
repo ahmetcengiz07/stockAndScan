@@ -269,12 +269,12 @@ const CashScreen = ({ navigation }) => {
 
       <View style={styles.statsContainer}>
         <View style={styles.statCard}>
-          <Text style={styles.statLabel}>Satış Adedi</Text>
+          <Text style={styles.statLabel}>İşlem Sayısı</Text>
           <Text style={styles.statValue}>{periodTotals.count}</Text>
         </View>
 
         <View style={styles.statCard}>
-          <Text style={styles.statLabel}>Satılan Ürün</Text>
+          <Text style={styles.statLabel}>Toplam Adet</Text>
           <Text style={styles.statValue}>{periodTotals.items}</Text>
         </View>
 
