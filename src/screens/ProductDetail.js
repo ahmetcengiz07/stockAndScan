@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { updateQuantity } from '../redux/slices/stockSlice';
 import { addTransaction } from '../redux/slices/cashSlice';
@@ -99,96 +99,104 @@ const ProductDetail = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.card}>
-        <View style={styles.header}>
-          <Ionicons
-            name={
-              product.category === 'Tulum'
-                ? 'shirt'
-                : product.category === 'Elbise'
-                  ? 'glasses'
-                  : product.category === 'Ayakkabı'
-                    ? 'walk'
-                    : 'shirt-outline'
-            }
-            size={40}
-            color="#20B2AA"
-          />
-          <Text style={styles.title}>{product.name}</Text>
-        </View>
-
-        <View style={styles.barcodeContainer}>
-          <Ionicons name="barcode-outline" size={24} color="#20B2AA" />
-          <Text style={styles.barcodeText}>Barkod: {product.barcode}</Text>
-        </View>
-
-        <View style={styles.infoRow}>
-          <Text style={styles.label}>Kategori:</Text>
-          <Text style={styles.value}>{product.category}</Text>
-        </View>
-
-        <View style={styles.infoRow}>
-          <Text style={styles.label}>Beden:</Text>
-          <Text style={styles.value}>{product.size}</Text>
-        </View>
-
-        <View style={styles.infoRow}>
-          <Text style={styles.label}>Renk:</Text>
-          <Text style={styles.value}>{product.color}</Text>
-        </View>
-
-        <View style={styles.infoRow}>
-          <Text style={styles.label}>Stok:</Text>
-          <Text style={[styles.value, styles.stockValue]}>{product.quantity}</Text>
-        </View>
-
-        <View style={styles.infoRow}>
-          <Text style={styles.label}>Fiyat:</Text>
-          <Text style={styles.value}>{Math.round(product.price)} TL</Text>
-        </View>
-
-        <View style={styles.saleQuantityContainer}>
-          <Text style={styles.label}>Satış Adedi:</Text>
-          <View style={styles.quantityContainer}>
-            <TouchableOpacity
-              style={styles.quantityButton}
-              onPress={() => setSaleQuantity(prev => Math.max(1, prev - 1))}
-              disabled={saleQuantity <= 1}
-            >
-              <Ionicons name="remove" size={24} color={saleQuantity <= 1 ? '#ccc' : '#20B2AA'} />
-            </TouchableOpacity>
-            <Text style={styles.quantityText}>{saleQuantity}</Text>
-            <TouchableOpacity
-              style={styles.quantityButton}
-              onPress={() => setSaleQuantity(prev => Math.min(currentStock, prev + 1))}
-              disabled={saleQuantity >= currentStock}
-            >
-              <Ionicons
-                name="add"
-                size={24}
-                color={saleQuantity >= currentStock ? '#ccc' : '#20B2AA'}
-              />
-            </TouchableOpacity>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.card}>
+          <View style={styles.header}>
+            <Ionicons
+              name={
+                product.category === 'Tulum'
+                  ? 'shirt'
+                  : product.category === 'Elbise'
+                    ? 'glasses'
+                    : product.category === 'Ayakkabı'
+                      ? 'walk'
+                      : 'shirt-outline'
+              }
+              size={40}
+              color="#20B2AA"
+            />
+            <Text style={styles.title}>{product.name}</Text>
           </View>
+
+          {product.photo && (
+            <View style={styles.photoContainer}>
+              <Image source={{ uri: product.photo.uri }} style={styles.photo} />
+            </View>
+          )}
+
+          <View style={styles.barcodeContainer}>
+            <Ionicons name="barcode-outline" size={24} color="#20B2AA" />
+            <Text style={styles.barcodeText}>Barkod: {product.barcode}</Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Kategori:</Text>
+            <Text style={styles.value}>{product.category}</Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Beden:</Text>
+            <Text style={styles.value}>{product.size}</Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Renk:</Text>
+            <Text style={styles.value}>{product.color}</Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Stok:</Text>
+            <Text style={[styles.value, styles.stockValue]}>{product.quantity}</Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Fiyat:</Text>
+            <Text style={styles.value}>{Math.round(product.price)} TL</Text>
+          </View>
+
+          <View style={styles.saleQuantityContainer}>
+            <Text style={styles.label}>Satış Adedi:</Text>
+            <View style={styles.quantityContainer}>
+              <TouchableOpacity
+                style={styles.quantityButton}
+                onPress={() => setSaleQuantity(prev => Math.max(1, prev - 1))}
+                disabled={saleQuantity <= 1}
+              >
+                <Ionicons name="remove" size={24} color={saleQuantity <= 1 ? '#ccc' : '#20B2AA'} />
+              </TouchableOpacity>
+              <Text style={styles.quantityText}>{saleQuantity}</Text>
+              <TouchableOpacity
+                style={styles.quantityButton}
+                onPress={() => setSaleQuantity(prev => Math.min(currentStock, prev + 1))}
+                disabled={saleQuantity >= currentStock}
+              >
+                <Ionicons
+                  name="add"
+                  size={24}
+                  color={saleQuantity >= currentStock ? '#ccc' : '#20B2AA'}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <TouchableOpacity style={styles.saleButton} onPress={handleSale}>
+            <Ionicons name="cart-outline" size={24} color="#fff" style={styles.saleIcon} />
+            <Text style={styles.saleButtonText}>
+              {saleQuantity > 1
+                ? `${saleQuantity} Adet Satış Yap (${Math.round(product.price * saleQuantity)} TL)`
+                : `Satış Yap (${Math.round(product.price)} TL)`}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => navigation.navigate('EditProduct', { product })}
+          >
+            <Ionicons name="create-outline" size={24} color="#fff" style={styles.editIcon} />
+            <Text style={styles.editButtonText}>Ürünü Düzenle</Text>
+          </TouchableOpacity>
         </View>
-
-        <TouchableOpacity style={styles.saleButton} onPress={handleSale}>
-          <Ionicons name="cart-outline" size={24} color="#fff" style={styles.saleIcon} />
-          <Text style={styles.saleButtonText}>
-            {saleQuantity > 1
-              ? `${saleQuantity} Adet Satış Yap (${Math.round(product.price * saleQuantity)} TL)`
-              : `Satış Yap (${Math.round(product.price)} TL)`}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.editButton}
-          onPress={() => navigation.navigate('EditProduct', { product })}
-        >
-          <Ionicons name="create-outline" size={24} color="#fff" style={styles.editIcon} />
-          <Text style={styles.editButtonText}>Ürünü Düzenle</Text>
-        </TouchableOpacity>
-      </View>
+      </ScrollView>
       <CustomModal
         visible={modalVisible}
         title={modalConfig.title}
@@ -203,13 +211,13 @@ const ProductDetail = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#f5f5f5',
   },
   card: {
     backgroundColor: '#fff',
     borderRadius: 15,
     padding: 20,
+    margin: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -344,6 +352,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     paddingHorizontal: 20,
+  },
+  photoContainer: {
+    width: '100%',
+    height: 200,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 12,
+    marginBottom: 20,
+    overflow: 'hidden',
+  },
+  photo: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
   },
 });
 

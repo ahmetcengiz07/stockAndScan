@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, FlatList, StyleSheet, Text, TouchableOpacity, TextInput } from 'react-native';
+import { View, FlatList, StyleSheet, Text, TouchableOpacity, TextInput, Image } from 'react-native';
 import { useSelector } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -30,37 +30,43 @@ const StockScreen = ({ navigation, route }) => {
         style={[styles.productCard, isLowStock && styles.lowStockCard]}
         onPress={() => navigation.navigate('ProductDetail', { product: item })}
       >
-        <View style={styles.productIconContainer}>
-          <Ionicons
-            name={
-              item.category === 'Tulum'
-                ? 'shirt'
-                : item.category === 'Elbise'
-                  ? 'glasses'
-                  : item.category === 'Ayakkabı'
-                    ? 'walk-outline'
-                    : 'shirt-outline'
-            }
-            size={24}
-            color={isLowStock ? '#FF6B6B' : '#20B2AA'}
-          />
-        </View>
-        <View style={styles.productInfo}>
-          <Text style={styles.productName}>{item.name}</Text>
-          <Text style={styles.productDetails}>
-            {item.category} - {item.size} - {item.color}
-          </Text>
-          {isLowStock && (
-            <Text style={styles.criticalStockWarning}>
-              Kritik Stok Uyarısı: {item.quantity} adet kaldı!
-            </Text>
+        <View style={styles.cardContent}>
+          {item.photo ? (
+            <Image source={{ uri: item.photo.uri }} style={styles.productImage} />
+          ) : (
+            <View style={styles.productIconContainer}>
+              <Ionicons
+                name={
+                  item.category === 'Tulum'
+                    ? 'shirt'
+                    : item.category === 'Elbise'
+                      ? 'glasses'
+                      : item.category === 'Ayakkabı'
+                        ? 'walk-outline'
+                        : 'shirt-outline'
+                }
+                size={24}
+                color={isLowStock ? '#FF6B6B' : '#20B2AA'}
+              />
+            </View>
           )}
-        </View>
-        <View style={styles.quantityContainer}>
-          <Text style={[styles.quantity, isLowStock ? styles.lowStock : null]}>
-            {item.quantity}
-          </Text>
-          <Text style={styles.price}>{item.price} TL</Text>
+          <View style={styles.productInfo}>
+            <Text style={styles.productName}>{item.name}</Text>
+            <Text style={styles.productDetails}>
+              {item.category} - {item.size} - {item.color}
+            </Text>
+            {isLowStock && (
+              <Text style={styles.criticalStockWarning}>
+                Kritik Stok Uyarısı: {item.quantity} adet kaldı!
+              </Text>
+            )}
+          </View>
+          <View style={styles.quantityContainer}>
+            <Text style={[styles.quantity, isLowStock ? styles.lowStock : null]}>
+              {item.quantity}
+            </Text>
+            <Text style={styles.price}>{item.price} TL</Text>
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -153,18 +159,26 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 10,
     borderRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
+  cardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  productImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 8,
+    marginRight: 12,
+  },
   productIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 50,
+    height: 50,
+    borderRadius: 8,
     backgroundColor: '#FFF0F5',
     justifyContent: 'center',
     alignItems: 'center',

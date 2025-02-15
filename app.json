@@ -9,13 +9,13 @@
     "splash": {
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSCameraUsageDescription": "Barkod taraması yapabilmek için kamera izni gerekiyor"
+        "NSCameraUsageDescription": "Barkod taraması ve ürün fotoğrafı çekimi için kamera izni gerekiyor",
+        "NSPhotoLibraryUsageDescription": "Ürün fotoğrafı seçmek için galeri izni gerekiyor",
+        "NSPhotoLibraryAddUsageDescription": "Çekilen fotoğrafları kaydetmek için galeri izni gerekiyor"
       }
     },
     "android": {
@@ -23,7 +23,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": ["CAMERA"]
+      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "MEDIA_LIBRARY"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -32,7 +32,14 @@
       [
         "expo-barcode-scanner",
         {
-          "cameraPermission": "Barkod taraması yapabilmek için kamera izni gerekiyor."
+          "cameraPermission": "Barkod taraması ve ürün fotoğrafı çekimi için kamera izni gerekiyor."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Galeriden fotoğraf seçmek için izin vermelisiniz.",
+          "cameraPermission": "Kamera kullanabilmek için izin vermelisiniz."
         }
       ]
     ]

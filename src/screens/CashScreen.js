@@ -11,6 +11,7 @@ import {
   Platform,
   UIManager,
   ScrollView,
+  Image,
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
@@ -249,17 +250,28 @@ const CashScreen = ({ navigation }) => {
       onLongPress={() => handleCancelTransaction(item)}
       onPress={() => handleTransactionPress(item)}
     >
-      <View style={styles.transactionHeader}>
-        <View style={styles.productInfo}>
-          <Text style={styles.productName}>{item.productName}</Text>
-          <Text style={styles.barcodeText}>Barkod: {item.barcode}</Text>
-        </View>
-        <Text style={styles.date}>{new Date(item.date).toLocaleDateString('tr-TR')}</Text>
-      </View>
+      <View style={styles.transactionContent}>
+        {item.product?.photo ? (
+          <Image source={{ uri: item.product.photo.uri }} style={styles.productImage} />
+        ) : (
+          <View style={styles.productIconContainer}>
+            <Ionicons name="cart-outline" size={24} color="#20B2AA" />
+          </View>
+        )}
+        <View style={styles.transactionDetails}>
+          <View style={styles.transactionHeader}>
+            <View style={styles.productInfo}>
+              <Text style={styles.productName}>{item.productName}</Text>
+              <Text style={styles.barcodeText}>Barkod: {item.barcode}</Text>
+            </View>
+            <Text style={styles.date}>{new Date(item.date).toLocaleDateString('tr-TR')}</Text>
+          </View>
 
-      <View style={styles.transactionDetails}>
-        <Text style={styles.quantity}>{item.quantity} adet</Text>
-        <Text style={styles.amount}>{item.amount} TL</Text>
+          <View style={styles.transactionFooter}>
+            <Text style={styles.quantity}>{item.quantity} adet</Text>
+            <Text style={styles.amount}>{item.amount} TL</Text>
+          </View>
+        </View>
       </View>
 
       {item.isMultiSale && (
@@ -496,6 +508,28 @@ const styles = StyleSheet.create({
   transactionCardWithHint: {
     paddingBottom: 0, // İpucu görünürken padding'i kaldır
   },
+  transactionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  productImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 8,
+    marginRight: 12,
+  },
+  productIconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 8,
+    backgroundColor: '#f8f8f8',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  transactionDetails: {
+    flex: 1,
+  },
   transactionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -519,7 +553,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
   },
-  transactionDetails: {
+  transactionFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
