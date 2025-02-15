@@ -8,11 +8,16 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Image,
+  Alert,
+  Modal,
+  Pressable,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { addProduct } from '../redux/slices/stockSlice';
 import { Ionicons } from '@expo/vector-icons';
 import CustomModal from '../components/CustomModal';
+import * as ImagePicker from 'expo-image-picker';
 
 const AddProductScreen = ({ route, navigation }) => {
   const dispatch = useDispatch();
@@ -32,6 +37,8 @@ const AddProductScreen = ({ route, navigation }) => {
     message: '',
     type: 'success',
   });
+  const [photo, setPhoto] = useState(null);
+  const [showPhotoModal, setShowPhotoModal] = useState(false);
 
   const categories = [
     'Yenidoğan takımları',
@@ -79,6 +86,7 @@ const AddProductScreen = ({ route, navigation }) => {
     'Pembe',
     'Gri',
     'Kahverengi',
+    'Diğer',
   ];
 
   const colorCodes = {
@@ -92,6 +100,7 @@ const AddProductScreen = ({ route, navigation }) => {
     Pembe: '#FFC0CB',
     Gri: '#808080',
     Kahverengi: '#8B4513',
+    Diğer: '#000',
   };
 
   const formatPrice = value => {
@@ -99,6 +108,72 @@ const AddProductScreen = ({ route, navigation }) => {
     const formattedValue = Number(cleanValue).toLocaleString('tr-TR');
     setFormattedPrice(formattedValue);
     setPrice(cleanValue);
+  };
+
+  const handleTakePhoto = async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+
+      if (status !== 'granted') {
+        Alert.alert('İzin Gerekli', 'Kamerayı kullanabilmek için izin vermeniz gerekiyor.');
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.5,
+      });
+
+      if (!result.canceled) {
+        const asset = result.assets[0];
+        setPhoto({
+          uri: asset.uri,
+          type: 'image/jpeg',
+          name: 'photo.jpg',
+        });
+      }
+    } catch (error) {
+      console.log('Kamera hatası:', error);
+      Alert.alert('Hata', 'Fotoğraf çekilirken bir hata oluştu.');
+    }
+    setShowPhotoModal(false);
+  };
+
+  const handleChoosePhoto = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (status !== 'granted') {
+        Alert.alert('İzin Gerekli', 'Galeriyi kullanabilmek için izin vermeniz gerekiyor.');
+        return;
+      }
+
+      let result = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.5,
+        presentationStyle: 'pageSheet',
+        selectionLimit: 1,
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      });
+
+      console.log('Galeri sonucu:', result);
+
+      if (!result.canceled) {
+        const asset = result.assets[0];
+        const filename = asset.uri.split('/').pop() || 'photo.jpg';
+        setPhoto({
+          uri: asset.uri,
+          type: 'image/jpeg',
+          name: filename,
+        });
+      }
+    } catch (error) {
+      console.log('Galeri hatası:', error);
+      Alert.alert('Hata', 'Fotoğraf seçilirken bir hata oluştu.');
+    }
+    setShowPhotoModal(false);
   };
 
   const handleSave = () => {
@@ -130,6 +205,13 @@ const AddProductScreen = ({ route, navigation }) => {
       color,
       price: parseFloat(price),
       quantity: parseInt(quantity),
+      photo: photo
+        ? {
+            uri: photo.uri,
+            type: 'image/jpeg',
+            name: photo.name || 'photo.jpg',
+          }
+        : null,
     };
 
     dispatch(addProduct(newProduct));
@@ -160,6 +242,17 @@ const AddProductScreen = ({ route, navigation }) => {
         contentContainerStyle={{ paddingBottom: 50 }}
       >
         <View style={styles.card}>
+          <TouchableOpacity style={styles.photoContainer} onPress={() => setShowPhotoModal(true)}>
+            {photo ? (
+              <Image source={{ uri: photo.uri }} style={styles.photo} />
+            ) : (
+              <View style={styles.photoPlaceholder}>
+                <Ionicons name="camera-outline" size={40} color="#666" />
+                <Text style={styles.photoPlaceholderText}>Fotoğraf Ekle</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Barkod:</Text>
             <View style={styles.barcodeInputContainer}>
@@ -316,15 +409,59 @@ const AddProductScreen = ({ route, navigation }) => {
             <Text style={styles.saveButtonText}>Kaydet</Text>
           </TouchableOpacity>
         </View>
-
-        <CustomModal
-          visible={modalVisible}
-          title={modalConfig.title}
-          message={modalConfig.message}
-          type={modalConfig.type}
-          onClose={handleModalClose}
-        />
       </ScrollView>
+
+      <Modal
+        visible={showPhotoModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowPhotoModal(false)}
+      >
+        <Pressable style={styles.modalOverlay} onPress={() => setShowPhotoModal(false)}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Fotoğraf Seç</Text>
+              <TouchableOpacity
+                style={styles.modalCloseButton}
+                onPress={() => setShowPhotoModal(false)}
+              >
+                <Ionicons name="close" size={24} color="#333" />
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity style={styles.photoOption} onPress={handleTakePhoto}>
+              <Ionicons name="camera" size={24} color="#333" />
+              <Text style={styles.photoOptionText}>Fotoğraf Çek</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.photoOption} onPress={handleChoosePhoto}>
+              <Ionicons name="image" size={24} color="#333" />
+              <Text style={styles.photoOptionText}>Galeriden Seç</Text>
+            </TouchableOpacity>
+
+            {photo && (
+              <TouchableOpacity
+                style={[styles.photoOption, styles.deleteOption]}
+                onPress={() => {
+                  setPhoto(null);
+                  setShowPhotoModal(false);
+                }}
+              >
+                <Ionicons name="trash" size={24} color="#FF6B6B" />
+                <Text style={[styles.photoOptionText, { color: '#FF6B6B' }]}>Fotoğrafı Sil</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </Pressable>
+      </Modal>
+
+      <CustomModal
+        visible={modalVisible}
+        title={modalConfig.title}
+        message={modalConfig.message}
+        type={modalConfig.type}
+        onClose={handleModalClose}
+      />
     </KeyboardAvoidingView>
   );
 };
@@ -433,6 +570,71 @@ const styles = StyleSheet.create({
   },
   barcodeInput: {
     flex: 1,
+    fontSize: 16,
+    color: '#333',
+  },
+  photoContainer: {
+    width: '100%',
+    height: 200,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 12,
+    marginBottom: 20,
+    overflow: 'hidden',
+  },
+  photo: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  photoPlaceholder: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  photoPlaceholderText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    width: '85%',
+    padding: 20,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+  },
+  modalCloseButton: {
+    padding: 4,
+  },
+  photoOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 15,
+    gap: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  deleteOption: {
+    borderBottomWidth: 0,
+  },
+  photoOptionText: {
     fontSize: 16,
     color: '#333',
   },
